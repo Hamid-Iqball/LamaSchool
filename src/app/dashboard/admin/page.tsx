@@ -2,7 +2,7 @@
 
 function AdminPage() {
   return (
-    <div></div>
+    <div>hey</div>
   )
 }
 
