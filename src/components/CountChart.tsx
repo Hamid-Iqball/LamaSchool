@@ -37,7 +37,7 @@ function CountChart() {
                 <Image src="/moreDark.png" alt='' width={20} height={20}/>
                 </div>
         {/* CHART */}
-        <div className='w-full h-[75%]'>
+        <div className='relative w-full h-[75%]'>
         <ResponsiveContainer >
         <RadialBarChart cx="50%" cy="50%" innerRadius="40%" outerRadius="100%" barSize={32} data={data}>
           <RadialBar
@@ -50,6 +50,7 @@ function CountChart() {
           {/* <Legend iconSize={10} layout="vertical" verticalAlign="middle"  /> */}
         </RadialBarChart>
       </ResponsiveContainer>
+      <Image src="/maleFemale.png"  width={50} height={50} alt='' className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 '/>
         </div>
         {/* BUTTONS */}
         <div className='flex justify-center gap-16'>
