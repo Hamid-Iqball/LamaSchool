@@ -3,6 +3,7 @@ import UserCart from "@/components/UserCard"
 import AttendenceChart from "@/components/AttendenceChart"
 import FinanceChart from "@/components/FinanceChart"
 import EventCalender from "@/components/EventCalender"
+import Announcement from "@/components/Announcement"
 
 function AdminPage() {
   return (
@@ -35,7 +36,10 @@ function AdminPage() {
       </div>
       {/* RIGHT */}
       <div className="w-full lg:w-1/3 flex flex-col gap-8 ">
-      <EventCalender/></div>
+      <EventCalender/>
+      
+      <Announcement />
+      </div>
           </div>
   )
 }
