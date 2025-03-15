@@ -21,7 +21,9 @@ function BigCalander() {
     views={["work_week","day"]}
     view={view}
     onView={handleView}
-    style={{ height: 500 }}
+    style={{ height: "98%" }}
+    min={new Date(2025,3,15,8,0,0)}
+    max={new Date(2025,3,15,17,0,0)}
   />
   )
 }
