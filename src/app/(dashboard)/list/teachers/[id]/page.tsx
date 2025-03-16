@@ -1,5 +1,6 @@
 import Announcement from "@/components/Announcement"
 import BigCalander from "@/components/BigCalander"
+import Performance from "@/components/Performance"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -81,7 +82,7 @@ function SignleTeacherPage() {
         </div>
         </div>
         {/* RIGHT */}
-        <div className="w-full xl:w-1/3">
+        <div className="w-full xl:w-1/3 flex flex-col gap-4">
         <div className="bg-white p-4 rounded-md">
             <h1 className="text-xl font-semibold">Shorcuts</h1>
             <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500">
@@ -92,6 +93,7 @@ function SignleTeacherPage() {
                 <Link href="/" className="p-3 rounded-md bg-lamaSkyLight">Teacher&apos;s Assignments</Link>
             </div>
         </div>
+        <Performance/>
        <Announcement/>
         </div>
     </div>
