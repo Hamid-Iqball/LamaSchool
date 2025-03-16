@@ -1,3 +1,4 @@
+import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
@@ -72,17 +73,12 @@ const renderRow = (item:Event)=>(
  
   <td>
     <div className="flex items-center gap-2">
-      <Link href={`list/teachers/${item.id}`}>
-      <button className="w-7 h-7 flex justify-center items-center gap-2 bg-lamaSky rounded-full ">
-        <Image src="/edit.png" alt="" width={16} height={16}/>
-        </button>
-        </Link>
-        <Link href="">
-      { role==="admin" && <button className="w-7 h-7 flex justify-center items-center gap-2 bg-lamaPurple rounded-full ">
-        <Image src="/delete.png" alt="" width={16} height={16}/>
-        </button>}
-        </Link>
-        
+    
+    {  role==="admin" && <>
+     <FormModal type="update"  table="event" data={item}  />
+       
+      <FormModal type="delete"  table="event" id={item.id}  /> </>}
+       
     </div>
   </td>
 </tr>
@@ -103,9 +99,7 @@ function  EventListPage() {
         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
           <Image src="/sort.png" alt="" width={14} height={14} />
         </button>
-       { role === "admin" && (<button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-          <Image src="/plus.png" alt="" width={14} height={14} />
-        </button> )}
+       { role === "admin" && <FormModal table="event" type="create"/>}
       </div>
     </div>
     </div>
