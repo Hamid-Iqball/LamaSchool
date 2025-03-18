@@ -25,7 +25,7 @@ function FormModal({table , type , data , id}:{
       <div className="bg-white p-4 rounded-md relative w-[90%] md:w-[70%] lg:w-%[60%] xl:w-[50%] 2xl:w-[40%]">
 
         <div className="absolute top-4 right-4 cursor-pointer p-4 bg-black" onClick={()=>setOpen(false)}> 
-        <Image src="/close.png" width={14} height={14} alt="" />
+        <Image src="/close.png" width={14} height={14} alt="image" />
         </div>
         </div>
       </div>
