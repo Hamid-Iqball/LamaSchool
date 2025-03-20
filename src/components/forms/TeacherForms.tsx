@@ -1,9 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { error } from "console";
+
 import { Form, useForm } from "react-hook-form";
 import { z } from "zod";
+import InputField from "../InputField";
 
 const schema = z.object({
     username: z.string()
@@ -31,12 +32,19 @@ function TeacherForms({type ,data}:{type:"create" | "update", data?:any}) {
         resolver: zodResolver(schema),
       });
 
+      const onSubmit = handleSubmit((data)=>{
+        console.log(data)
+      })
   return (
-    <form className="flex flex-col gap-8">
+    <form className="flex flex-col gap-8" onSubmit={onSubmit}>
        <h1 className="text-xl font-semibold ">Create a new teacher</h1>
        <span className="text-xs text-gray-400 font-medium">Authentication Information</span>
-       <input type="text" {...register("username")}className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"/>
-       {errors.username?.message && <p>{errors.username?.message.toString()}</p>}
+      
+       <InputField  label="Username" name="Username" type="text" defaultValue={data?.username} register={register} error={errors.username}/>
+
+
+       
+
        <span className="text-xs text-gray-400 font-medium">Personal Information </span>
        
        <button className="bg-blue-400 text-white p-2 rounded-md">{type==="create" ?"Create" : "Update"}</button>
