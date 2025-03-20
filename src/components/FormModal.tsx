@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
+import TeacherForms from "./forms/TeacherForms";
 
 
 function FormModal({table , type , data , id}:{
@@ -26,7 +27,7 @@ function FormModal({table , type , data , id}:{
         Delete
         </button>
 
-      </form> : "create or update form"
+      </form> : <TeacherForms type="create"/>
     }
 
 
