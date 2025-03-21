@@ -1,10 +1,25 @@
 "use client"
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
-import TeacherForms from "./forms/TeacherForms";
+// import TeacherForms from "./forms/TeacherForms";
+// import StudentForm from "./forms/StudentForm";
 
+//This is how we import dynamically for better performance
+const TeacherForms = dynamic(()=>import("./forms/TeacherForms"),{
+  loading:()=><h1>Loading...</h1>
+})
+
+const StudentForm = dynamic(()=>import( "./forms/StudentForm"),{
+  loading:()=><h1>Loading...</h1>
+})
+
+const forms:{[key:string]:(type:"create" | "update", data?:any)=>JSX.Element;}={
+ teacher:(type,data)=><TeacherForms type={type} data={data} /> ,
+ student:(type,data)=><StudentForm type={type} data={data} /> 
+}
 
 function FormModal({table , type , data , id}:{
   table:"teacher" | "subject" | "parent" | "student" | "class" | "lesson" | "exam" | "assignment"|"result" | "attendence" | "event" | "announcement";
@@ -27,7 +42,7 @@ function FormModal({table , type , data , id}:{
         Delete
         </button>
 
-      </form> : <TeacherForms type="create"/>
+      </form> : type==="create" || type=== "update"?( forms[table](type,data)): "Form Not Found!"
     }
 
 

@@ -1,5 +1,6 @@
 import Announcement from "@/components/Announcement"
 import BigCalander from "@/components/BigCalander"
+import FormModal from "@/components/FormModal"
 import Performance from "@/components/Performance"
 import Image from "next/image"
 import Link from "next/link"
@@ -16,6 +17,23 @@ function SignleStudentPage() {
             <div className=" bg-lamaSky py-6 px-4 rounded-md flex-1 flex gap-4">
                 <div className="w-1/3">
                 <Image alt="" src="" width={144} height={144} className="w-36 h-36 rounded-full object-cover"/> </div>
+
+                <div className="flex items-center gap-4">
+                     <FormModal table="student" type="create" data={{
+                        id: 1,
+                        username: "jrodriguez",
+                        email: "jrodriguez@school.edu",
+                        password: "securepassword123",
+                        firstName: "Julia",
+                        lastName: "Rodriguez",
+                        img: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1200",
+                        phone: "5551234567",
+                        address: "289 Cedar Avenue, Oakwood Heights, NY 10301",
+                        bloodtype: "O+",
+                        birthday: "1985-06-12",
+                        sex: "female"
+                    }}/>
+                </div>
                 <div className="w-2/3 flex flex-col justify-between gap-4">
                 <h1 className="text-xl font-semibold">Hamid Iqbal</h1>
                 <p className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
