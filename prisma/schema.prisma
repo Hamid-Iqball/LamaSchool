@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Admin {
+  id String @id
+  username String @unique
+}
+
+// In a one-to-many relationship, you follow this pattern:
+// In the "one" model (e.g., Parent), you define a relationship array that refers to the many-side models (e.g., Student[]).
+// In the "many" model (e.g., Student), you define a reference to the "one" model using a foreign key.
+
+
+//In the first three model i am using the id as a string becasue we will have authentication but for other we won't have any authentications so we will use Int.
+model Student{
+    id String @id
+    username String @unique
+    name String
+    surname String
+    email String?
+    phone String?
+    address String?
+    img String?
+    bloodType String
+    sex UserSex
+    createdAt DateTime @default(now)
+    parentId String
+    parent Parent @relation(fields:[parentId], references:[id])   
+
+
+}
+
+model Teacher{
+   id String @id
+    username String @unique
+    name String
+    surname String
+    email String?
+    phone String?
+    address String?
+    img String?
+    bloodType String
+    sex UserSex
+    createdAt DateTime @default(now)
+    subjects Subject[] //mutiple subjects array
+}
+
+model Parent{
+   id String @id
+    username String @unique
+    name String
+    surname String
+    email String?
+    phone String?
+    address String?
+    createdAt DateTime @default(now)
+    students Student[]    //Parent and student has (one-to-many) relation. one parent can have many students.
+    lessons Lesson[]
+    classes Class[]
+
+}
+
+model Class{
+  id Int @id @default(autoincrement())
+  name String @unique
+  capacity Int
+  supervisorId String
+  supervisor Teacher @relation(fields:[supervisorId], references:[id])
+  lessons Lesson[]
+}
+
+
+
+model Subject {
+  id Int @id @default(autoincrement())
+  name String @unique
+  teachers Teacher[]
+  lessons Lesson[]
+}
+
+
+model Lesson{
+  id Int @id @default(autoincrement())
+  name String
+  day Day
+  startTime DateTime
+  endTime DateTime
+
+  subjectId Int
+  subject Subject @relation(fields:[subjectId], references:[id])
+  classId Int
+  class Class @relation(fields:[classId], references:[id])
+  teacherId Int
+  teacher Teacher @relation(fields:[teacherId], references:[id])
+  
+}
+
+
+
+enum UserSex{
+  MALE
+  FEMALE
+}
+
+
+enum Day{
+  MONDAYU
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
