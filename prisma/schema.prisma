@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -26,12 +21,12 @@ model Admin {
 
 //In the first three model i am using the id as a string becasue we will have authentication but for other we won't have any authentications so we will use Int.
 model Student{
-    id String @id
+    id  String @id
     username String @unique
     name String
     surname String
-    email String?
-    phone String?
+    email String? @unique
+    phone String? @unique
     address String?
     img String?
     bloodType String
@@ -39,6 +34,12 @@ model Student{
     createdAt DateTime @default(now)
     parentId String
     parent Parent @relation(fields:[parentId], references:[id])   
+    classId Int
+    class Class @relation(fields:[classId], reference:[id])
+    gradeId Int
+    grade Grade @relation(fields:[gradeId], reference :[id])
+    attendence Attendence[]
+    results Result[]
 
 
 }
@@ -48,9 +49,9 @@ model Teacher{
     username String @unique
     name String
     surname String
-    email String?
-    phone String?
-    address String?
+    email String? @unique
+    phone String? @unique
+    address String
     img String?
     bloodType String
     sex UserSex
@@ -58,13 +59,22 @@ model Teacher{
     subjects Subject[] //mutiple subjects array
 }
 
+
+model Grade {
+  id Int @id @default(autoincrement())
+  level Int @unique
+  
+  students Student[]
+  classes Class[]
+}
+
 model Parent{
    id String @id
     username String @unique
     name String
     surname String
-    email String?
-    phone String?
+    email String @unique
+    phone String @unique
     address String?
     createdAt DateTime @default(now)
     students Student[]    //Parent and student has (one-to-many) relation. one parent can have many students.
@@ -78,8 +88,14 @@ model Class{
   name String @unique
   capacity Int
   supervisorId String
+  //Relations
   supervisor Teacher @relation(fields:[supervisorId], references:[id])
+  gradeId Int
+  grade Grade @relation(fields:[gradeId], reference :[id])
   lessons Lesson[]
+  students Student[]
+  events Event[]
+  anouncements Announcement[]
 }
 
 
@@ -103,11 +119,90 @@ model Lesson{
   subject Subject @relation(fields:[subjectId], references:[id])
   classId Int
   class Class @relation(fields:[classId], references:[id])
-  teacherId Int
+  teacherId String
   teacher Teacher @relation(fields:[teacherId], references:[id])
+  exam Exam[]
+  assignment Assignment[]
+    attendence Attendence[]
+
   
 }
 
+model Exam{
+  id Int @id @default(autoincrement())
+  title String
+  startDate DateTime
+  endDate DateTime
+  lessonId Int
+  lessons Lesson @relation(fields:[lessonId], reference:[id])
+    resultid Int
+  result Result @relation(fields:[resultid], reference:[id])
+
+}
+
+ //result and assignment has a one to one relation
+model Assignment {
+  id Int @id @default(autoincrement())
+  title String
+  startTime DateTime
+  dueTime DateTime
+  lessonid Int
+  lessons Lesson @relation(fields:[lessonId], reference:[id])
+
+  resultid Int
+  result Result @relation(fields:[resultid], reference:[id])
+
+}
+
+model Result {
+  id Int @id @default(autoincrement())
+  score Int
+
+  assignmentId Int?
+  assignment Assignment? @relation(fields:[assignmentId], reference:[id])
+
+  examId Int?
+  exam Exam? @relation(fields:[examId], reference:[id])
+
+  studentId String
+  student Student @relation(fields:[studentId], reference:[id])
+
+}
+
+
+model Attendence {
+  id Int @id @default(autoincrement())
+  date DateTime
+  status Boolean
+  studentId String
+  student Student @relation(fields:[studentId], reference:[id])
+  
+  lessonId Int
+  lesson Lesson @relation(fields:[lessonId], reference:[id])
+}
+
+
+
+model Event {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  startTime DateTime
+  endTime DateTime
+
+  classId Int?
+  class Class @relation(fields:[classId], reference:[id])
+}
+
+
+model Announcement {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  date DateTime
+  classId Int?
+  class Class @relation(fields:[classId], reference:[id])
+}
 
 
 enum UserSex{
