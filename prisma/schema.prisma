@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,97 +7,82 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Admin {
-  id String @id
+  id String @id @default(uuid())
   username String @unique
 }
 
-// In a one-to-many relationship, you follow this pattern:
-// In the "one" model (e.g., Parent), you define a relationship array that refers to the many-side models (e.g., Student[]).
-// In the "many" model (e.g., Student), you define a reference to the "one" model using a foreign key.
-
-
-//In the first three model i am using the id as a string becasue we will have authentication but for other we won't have any authentications so we will use Int.
-model Student{
-    id  String @id
-    username String @unique
-    name String
-    surname String
-    email String? @unique
-    phone String? @unique
-    address String?
-    img String?
-    bloodType String
-    sex UserSex
-    createdAt DateTime @default(now)
-    parentId String
-    parent Parent @relation(fields:[parentId], references:[id])   
-    classId Int
-    class Class @relation(fields:[classId], reference:[id])
-    gradeId Int
-    grade Grade @relation(fields:[gradeId], reference :[id])
-    attendence Attendence[]
-    results Result[]
-
-
+model Student {
+  id String @id
+  username String @unique
+  name String
+  surname String
+  email String? @unique
+  phone String? @unique
+  address String?
+  img String?
+  bloodType String
+  sex UserSex
+  createdAt DateTime @default(now())
+  parentId String
+  parent Parent @relation(fields: [parentId], references: [id])
+  classId Int
+  class Class @relation(fields: [classId], references: [id])
+  gradeId Int
+  grade Grade @relation(fields: [gradeId], references: [id])
+  attendance Attendence[]
+  results Result[]
 }
 
-model Teacher{
-   id String @id
-    username String @unique
-    name String
-    surname String
-    email String? @unique
-    phone String? @unique
-    address String
-    img String?
-    bloodType String
-    sex UserSex
-    createdAt DateTime @default(now)
-    subjects Subject[] //mutiple subjects array
+model Teacher {
+  id String @id
+  username String @unique
+  name String
+  surname String
+  email String? @unique
+  phone String? @unique
+  address String
+  img String?
+  bloodType String
+  sex UserSex
+  createdAt DateTime @default(now())
+  subjects Subject[]
+  lessons Lesson[]
+  classes Class[]
 }
 
+model Parent {
+  id String @id
+  username String @unique
+  name String
+  surname String
+  email String @unique
+  phone String @unique
+  address String?
+  createdAt DateTime @default(now())
+  students Student[]
+}
 
 model Grade {
   id Int @id @default(autoincrement())
   level Int @unique
-  
   students Student[]
   classes Class[]
 }
 
-model Parent{
-   id String @id
-    username String @unique
-    name String
-    surname String
-    email String @unique
-    phone String @unique
-    address String?
-    createdAt DateTime @default(now)
-    students Student[]    //Parent and student has (one-to-many) relation. one parent can have many students.
-    lessons Lesson[]
-    classes Class[]
-
-}
-
-model Class{
+model Class {
   id Int @id @default(autoincrement())
   name String @unique
   capacity Int
   supervisorId String
-  //Relations
-  supervisor Teacher @relation(fields:[supervisorId], references:[id])
+  supervisor Teacher @relation(fields: [supervisorId], references: [id])
   gradeId Int
-  grade Grade @relation(fields:[gradeId], reference :[id])
+  grade Grade @relation(fields: [gradeId], references: [id])
   lessons Lesson[]
   students Student[]
   events Event[]
-  anouncements Announcement[]
+  announcements Announcement[]
 }
-
-
 
 model Subject {
   id Int @id @default(autoincrement())
@@ -107,81 +91,63 @@ model Subject {
   lessons Lesson[]
 }
 
-
-model Lesson{
+model Lesson {
   id Int @id @default(autoincrement())
   name String
   day Day
   startTime DateTime
   endTime DateTime
-
   subjectId Int
-  subject Subject @relation(fields:[subjectId], references:[id])
+  subject Subject @relation(fields: [subjectId], references: [id])
   classId Int
-  class Class @relation(fields:[classId], references:[id])
+  class Class @relation(fields: [classId], references: [id])
   teacherId String
-  teacher Teacher @relation(fields:[teacherId], references:[id])
-  exam Exam[]
-  assignment Assignment[]
-    attendence Attendence[]
-
-  
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+  exams Exam[]
+  assignments Assignment[]
+  attendances Attendence[]
 }
 
-model Exam{
+model Exam {
   id Int @id @default(autoincrement())
   title String
   startDate DateTime
   endDate DateTime
   lessonId Int
-  lessons Lesson @relation(fields:[lessonId], reference:[id])
-    resultid Int
-  result Result @relation(fields:[resultid], reference:[id])
-
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+  results Result[]
 }
 
- //result and assignment has a one to one relation
 model Assignment {
   id Int @id @default(autoincrement())
   title String
   startTime DateTime
   dueTime DateTime
-  lessonid Int
-  lessons Lesson @relation(fields:[lessonId], reference:[id])
-
-  resultid Int
-  result Result @relation(fields:[resultid], reference:[id])
-
+  lessonId Int
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+  results Result[]
 }
 
 model Result {
   id Int @id @default(autoincrement())
   score Int
-
   assignmentId Int?
-  assignment Assignment? @relation(fields:[assignmentId], reference:[id])
-
+  assignment Assignment? @relation(fields: [assignmentId], references: [id])
   examId Int?
-  exam Exam? @relation(fields:[examId], reference:[id])
-
+  exam Exam? @relation(fields: [examId], references: [id])
   studentId String
-  student Student @relation(fields:[studentId], reference:[id])
-
+  student Student @relation(fields: [studentId], references: [id])
 }
-
 
 model Attendence {
   id Int @id @default(autoincrement())
   date DateTime
   status Boolean
   studentId String
-  student Student @relation(fields:[studentId], reference:[id])
-  
+  student Student @relation(fields: [studentId], references: [id])
   lessonId Int
-  lesson Lesson @relation(fields:[lessonId], reference:[id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
 }
-
-
 
 model Event {
   id Int @id @default(autoincrement())
@@ -189,11 +155,9 @@ model Event {
   description String
   startTime DateTime
   endTime DateTime
-
   classId Int?
-  class Class @relation(fields:[classId], reference:[id])
+  class Class? @relation(fields: [classId], references: [id])
 }
-
 
 model Announcement {
   id Int @id @default(autoincrement())
@@ -201,18 +165,16 @@ model Announcement {
   description String
   date DateTime
   classId Int?
-  class Class @relation(fields:[classId], reference:[id])
+  class Class? @relation(fields: [classId], references: [id])
 }
 
-
-enum UserSex{
+enum UserSex {
   MALE
   FEMALE
 }
 
-
-enum Day{
-  MONDAYU
+enum Day {
+  MONDAY
   TUESDAY
   WEDNESDAY
   THURSDAY
