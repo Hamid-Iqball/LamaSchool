@@ -1,17 +1,44 @@
 "use client"
 
-function Paginations() {
+import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { useRouter } from "next/navigation"
+
+function Paginations({page,count}:{page:number, count:number}) {
+  const router = useRouter()
+  const currentPage = Number(page) || 1
+
+  const hasPrevious = ITEMS_PER_PAGE * (page-1) > 0;
+  const hasNext = ITEMS_PER_PAGE *(page-1) + ITEMS_PER_PAGE < count
+
+  const changePage = (newPage:number)=>{
+    const params  = new URLSearchParams(window.location.search)
+    params.set("page",newPage.toString() )
+    router.push(`${window.location.pathname}?${params}`)
+  }
   return (
     <div className="p-4 flex justify-between items-center text-gray-500">
-        <button className="py-2 px-4  rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed ">Prev</button>
+        <button  onClick={()=>changePage(currentPage-1)}  className="py-2 px-4  rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed " disabled={!hasPrevious}>Prev</button>
         <div className="flex items-center text-sm">
-            <button className="px-2 rounded-sm bg-lamaSky">1</button>
-            <button className="px-2 rounded-sm ">2</button>
-            <button className="px-2 rounded-sm ">3</button>
-            ...
-            <button className="px-2 rounded-md">10</button>
+          {
+            Array.from( //Items, mapFn
+              {
+                length:Math.ceil(count/ITEMS_PER_PAGE)
+              },
+              (_,index)=>{
+                const pageIndex =index+1;
+                return (
+
+                  <button 
+                  onClick={()=>changePage(pageIndex)}
+                  className={`px-2 rounded-sm mx-1 ${currentPage===pageIndex ?"bg-lamaSky" : ""}`} key={pageIndex}>{pageIndex}</button>
+                )
+              }
+            )
+          }
+         
+           
         </div>
-        <button  className="py-2 px-4  rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed ">Next</button>
+        <button  className="py-2 px-4  rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed" onClick={()=>changePage(currentPage+1)} disabled={!hasNext}>Next</button>
 
     </div>
   )
