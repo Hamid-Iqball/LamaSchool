@@ -31,7 +31,6 @@ function SignleStudentPage() {
                         address: "289 Cedar Avenue, Oakwood Heights, NY 10301",
                         bloodtype: "O+",
                         birthday: "1985-06-12",
-                        sex: "female"
                     }}/>
                 </div>
                 <div className="w-2/3 flex flex-col justify-between gap-4">

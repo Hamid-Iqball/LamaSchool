@@ -7,8 +7,8 @@ function Paginations({page,count}:{page:number, count:number}) {
   const router = useRouter()
   const currentPage = Number(page) || 1
 
-  const hasPrevious = ITEMS_PER_PAGE * (page-1) > 0;
-  const hasNext = ITEMS_PER_PAGE *(page-1) + ITEMS_PER_PAGE < count
+  const hasPrevious = currentPage > 1;
+  const hasNext = ITEMS_PER_PAGE * currentPage < count
 
   const changePage = (newPage:number)=>{
     const params  = new URLSearchParams(window.location.search)
