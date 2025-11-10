@@ -50,18 +50,22 @@ async function StudentsList({searchParams}:{
 
   const query: Prisma.StudentWhereInput = {}
   
-if(queryParams){
-  for(const [key,value] of Object.entries(queryParams)){
-    if(value !== undefined){
-      switch (key) {
-           case "teacherId":
-            query.class={
-              lessons:{
-                some:{
-                  teacherId :value
-                }
-              }
+    if(queryParams){
+      for(const [key,value] of Object.entries(queryParams)){
+        if(value !== undefined){
+          switch (key) {
+            case "teacherId":
+         query.class = {
+      
+          lessons: {
+            some: {
+              teacherId: value
             }
+          }
+        
+      }
+      break;
+
 
           case "search":
             query.name = {contains:value, mode:"insensitive"}
@@ -79,7 +83,6 @@ if(queryParams){
   prisma.student.findMany({
      where:query,
       include:{
-    
         class:true
       },
       take:ITEMS_PER_PAGE,

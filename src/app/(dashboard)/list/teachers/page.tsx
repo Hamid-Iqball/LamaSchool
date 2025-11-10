@@ -11,6 +11,7 @@ import Image from "next/image"
 import { teacherColumns as columns } from "@/lib/contants"
 import Link from "next/link"
 
+
 type TeachersList = Teacher & {subjects:Subject[]} & {classes:Class[]}
 
 
@@ -34,9 +35,13 @@ const renderRow = (item:TeachersList)=>(
   <td>
     <div className="flex items-center gap-2">
     {  role==="admin" && <>
-     <FormModal type="update"  table="teacher" data={item}  />
+    <Link href={`/list/teachers/${item.id}`}>
+       <Image src="/view.png" alt=""  width={30} height={30} className="p-1 rounded-xl hover:cursor-pointer"  />
+    </Link>
        
-      <FormModal type="delete"  table="teacher" id={item.id}  /> </>}
+      <FormModal type="delete"  table="teacher" id={item.id}  />
+      
+       </>}
         
     </div>
   </td>
@@ -78,23 +83,23 @@ async function TeachersList({searchParams}:{
 
  const [data,count] = await prisma.$transaction([
 
-  prisma.teacher.findMany({
-     where:query,
-      include:{
-        subjects:true,
-        classes:true
-      },
-      take:ITEMS_PER_PAGE,
-      skip: ITEMS_PER_PAGE*(p-1),
+   prisma.teacher.findMany({
+        where:query,
+          include:{
+            subjects:true,
+            classes:true
+          },
+          take:ITEMS_PER_PAGE,
+          skip: ITEMS_PER_PAGE*(p-1),
 
-      
-    }),
+          
+        }),
 
      prisma.teacher.count({where:query})
-    
-  ])
+        
+      ])
 
- console.log(count)
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
