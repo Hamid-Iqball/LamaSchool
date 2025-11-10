@@ -5,53 +5,14 @@ import TableSearch from "@/components/TableSearch"
 import { role, teachersData } from "@/lib/data"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
-import { Class, Subject, Teacher } from "@prisma/client"
+import { Class, Prisma, Subject, Teacher } from "@prisma/client"
 import { headers } from "next/headers"
 import Image from "next/image"
+import { teacherColumns as columns } from "@/lib/contants"
 import Link from "next/link"
 
 type TeachersList = Teacher & {subjects:Subject[]} & {classes:Class[]}
 
-const columns =[
-  {
-    header:"Info", accessor:"Info"
-
-  },
-  {
-    header:"Teacher ID", 
-    accessor:"teacherid", 
-    className:"hidden md:table-cell"
-
-  },
-  {
-    header:"Subjects", 
-    accessor:"subjects", 
-    className:"hidden md:table-cell"
-
-  },
-  {
-    header:"classes", 
-    accessor:"classes", 
-    className:"hidden md:table-cell"
-
-  },
-  {
-    header:"Phone", 
-    accessor:"phone", 
-    className:"hidden lg:table-cell"
-
-  },
-  {
-    header:"Address", 
-    accessor:"address", 
-    className:"hidden lg:table-cell"
-
-  },
-  {
-    header:"Actions",
-    accessor:"actions"
-  }
-]
 
 const renderRow = (item:TeachersList)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
@@ -86,21 +47,53 @@ async function TeachersList({searchParams}:{
   searchParams:{[key:string]: | string |undefined} // index signature
 }) {
 
-  const {page ,...otherParams} = searchParams
+  const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
 
+  const query: Prisma.TeacherWhereInput = {}
+  
+if(queryParams){
+  for(const [key,value] of Object.entries(queryParams)){
+    if(value !== undefined){
+      switch (key) {
+        case "classId":
+          {query.lessons={
+            some:
+            {classId:
+              parseInt(value)
+            }}}        
+          break;
 
-  const teachers =  await prisma.teacher.findMany({
-    include:{
-      subjects:true,
-      classes:true
-    },
-    take:ITEMS_PER_PAGE,
-    skip: ITEMS_PER_PAGE*(p-1)
-    })
 
+          case "search":
+            query.name = {contains:value, mode:"insensitive"}
+            break;
+          
+          default:
+            break;
+          }
+        }
+  }
+}
 
-    const count= await prisma.teacher.count()
+ const [data,count] = await prisma.$transaction([
+
+  prisma.teacher.findMany({
+     where:query,
+      include:{
+        subjects:true,
+        classes:true
+      },
+      take:ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE*(p-1),
+
+      
+    }),
+
+     prisma.teacher.count({where:query})
+    
+  ])
+
  console.log(count)
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
@@ -127,7 +120,7 @@ async function TeachersList({searchParams}:{
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={teachers}/>
+      <Table columns={columns} renderRow={renderRow} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">
