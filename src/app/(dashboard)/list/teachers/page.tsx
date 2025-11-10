@@ -17,7 +17,7 @@ type TeachersList = Teacher & {subjects:Subject[]} & {classes:Class[]}
 const renderRow = (item:TeachersList)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   <td className="flex items-center gap-4 p-4">
-    <Image src={item.img || "/noAvatar.png"} alt="" width={40} height={40} 
+    <Image src={item.img || "/avatar.png"} alt="" width={40} height={40} 
     className="md:hidden w-10 h-10 xl:block rounded-full object-cover"/>
     <div className="flex flex-col">
       <h3 className="font-semibold">{item.name}</h3>
@@ -52,7 +52,7 @@ async function TeachersList({searchParams}:{
 
   const query: Prisma.TeacherWhereInput = {}
   
-if(queryParams){
+ if(queryParams){
   for(const [key,value] of Object.entries(queryParams)){
     if(value !== undefined){
       switch (key) {
@@ -74,7 +74,7 @@ if(queryParams){
           }
         }
   }
-}
+ }
 
  const [data,count] = await prisma.$transaction([
 

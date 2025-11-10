@@ -38,3 +38,34 @@ export const teacherColumns =[
     accessor:"actions"
   }
 ]
+
+
+export const studnetColumns =[
+  {
+    header:"Info", accessor:"Info"
+
+  },
+  {
+    header:"Student ID", 
+    accessor:"studentId", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Grade", 
+    accessor:"grade", 
+    className:"hidden md:table-cell"
+
+  },
+  
+  {
+    header:"Address", 
+    accessor:"address", 
+    className:"hidden lg:table-cell"
+
+  },
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]
