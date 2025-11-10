@@ -124,7 +124,7 @@ async function TeachersList({searchParams}:{
     </div>
     {/* Pagination */}
     <div className="">
-      <Paginations count={count} page={page} />
+      <Paginations count={count} page={p} />
     </div>
     </div>
   )

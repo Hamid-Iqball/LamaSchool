@@ -25,7 +25,7 @@ function FormModal({table , type , data , id}:{
   table:"teacher" | "subject" | "parent" | "student" | "class" | "lesson" | "exam" | "assignment"|"result" | "attendence" | "event" | "announcement";
   type:"create" | "update" | "delete";
   data?:any;
-  id?:number
+  id?:number | String
   }) {
       
    const [open, setOpen] = useState(false)
