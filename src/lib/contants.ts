@@ -69,3 +69,54 @@ export const studnetColumns =[
     accessor:"actions"
   }
 ]
+
+
+export const parentsColumns =[
+  {
+    header:"Info", accessor:"Info"
+
+  },
+  {
+    header:"Student Name", 
+    accessor:"studentName", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Phone", 
+    accessor:"phone", 
+    className:"hidden md:table-cell"
+
+  },
+  
+  {
+    header:"Address", 
+    accessor:"address", 
+    className:"hidden lg:table-cell"
+
+  },
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]
+
+
+
+export const subjectColumns =[
+  {
+    header:"Subject Name", accessor:"name"
+
+  },
+  {
+    header:"Teachers", 
+    accessor:"teachers", 
+    className:"hidden md:table-cell"
+
+  },
+
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]

@@ -2,52 +2,20 @@ import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
+import { parentsColumns as columns } from "@/lib/contants"
+import { Parent, Prisma, Student } from "@prisma/client"
 import { parentsData, role, studentsData, teachersData } from "@/lib/data"
+
 import { headers } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
+import prisma from "@/lib/prisma"
+import { ITEMS_PER_PAGE } from "@/lib/settings"
 
-type Parent ={
-  id:number;
-  name:string;
-  email?:string;
-  students:string[];
-  phone:string;
-  address:string;
+type parentList = Parent & {students : Student[]}
 
 
-}
-const columns =[
-  {
-    header:"Info", accessor:"Info"
-
-  },
-  {
-    header:"Student Name", 
-    accessor:"studentName", 
-    className:"hidden md:table-cell"
-
-  },
-  {
-    header:"Phone", 
-    accessor:"phone", 
-    className:"hidden md:table-cell"
-
-  },
-  
-  {
-    header:"Address", 
-    accessor:"address", 
-    className:"hidden lg:table-cell"
-
-  },
-  {
-    header:"Actions",
-    accessor:"actions"
-  }
-]
-
-const renderRow = (item:Parent)=>(
+const renderRow = (item:parentList)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   <td className="flex items-center gap-4 p-4">
     
@@ -57,7 +25,7 @@ const renderRow = (item:Parent)=>(
       <p className="text-xs text-gray-500">{item?.email}</p>
     </div>
   </td>
-    <td className="hidden md:table-cell">{item.students.join("")}</td>
+    <td className="hidden md:table-cell">{item.students.map(s=>s.name).join(", ")}</td>
 
     <td className="hidden md:table-cell">{item.phone}</td>
     <td className="hidden md:table-cell">{item.address}</td>
@@ -73,7 +41,51 @@ const renderRow = (item:Parent)=>(
 </tr>
 )
 
-function ParentsList() {
+async function ParentsList({searchParams}:{
+  searchParams:{[key:string] : string | undefined}
+}) {
+
+
+  const {page, ...queryParams} = searchParams
+  const p = page? parseInt(page) :1
+  const query:Prisma.ParentWhereInput = {}
+
+
+  if(queryParams){
+  for(const [key,value] of Object.entries(queryParams)){
+    if(value !==undefined){
+      switch (key) {
+        case "search":
+          query.name ={contains:value,mode:"insensitive"}
+          
+          break;
+      
+        default:
+          break;
+      }
+    }
+  }
+ }
+
+
+//TO run multiple queries together
+const [data,count] = await prisma.$transaction([
+ 
+  prisma.parent.findMany({
+    where:query,
+    include:{
+      students:true
+    },
+    take:ITEMS_PER_PAGE,
+    skip:ITEMS_PER_PAGE*(p-1)
+  }),
+
+  prisma.parent.count({where:query})
+])
+
+
+console.log(data)
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
@@ -94,11 +106,11 @@ function ParentsList() {
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={parentsData}/>
+      <Table columns={columns} renderRow={renderRow} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">
-      <Paginations />
+      <Paginations page={p} count={count}/>
     </div>
     </div>
   )
