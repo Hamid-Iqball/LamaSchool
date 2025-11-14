@@ -15,7 +15,7 @@ import Link from "next/link"
 type studendList = Student & {class:Class}
 
 const renderRow = (item:studendList)=>(
-<tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
+  <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   <td className="flex items-center gap-4 p-4">
     <Image src={item.img || "/avatar.png"} alt="" width={40} height={40} 
     className="md:hidden w-10 h-10 xl:block rounded-full object-cover"/>
@@ -41,60 +41,60 @@ const renderRow = (item:studendList)=>(
 
 async function StudentsList({searchParams}:{
   searchParams:{[key:string]: | string |undefined} // index signature { page: "2",search: "ali"} the searchparams is an object
-
+  
 }) {
-
-
- const {page ,...queryParams} = searchParams
+  
+  
+  const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
-
+  
   const query: Prisma.StudentWhereInput = {}
   
-    if(queryParams){
-      for(const [key,value] of Object.entries(queryParams)){
-        if(value !== undefined){
-          switch (key) {
-            case "teacherId":
-         query.class = {
-      
-          lessons: {
+  if(queryParams){
+    for(const [key,value] of Object.entries(queryParams)){
+      if(value !== undefined){
+        switch (key) {
+          case "teacherId":
+            query.class = {
+              lessons: {
             some: {
               teacherId: value
             }
           }
-        
+          
       }
       break;
-
-
-          case "search":
-            query.name = {contains:value, mode:"insensitive"}
-            break;
-          
-          default:
+      
+      
+      case "search":
+        query.name = {contains:value, mode:"insensitive"}
+        break;
+        
+        default:
             break;
           }
         }
-  }
-}
-
- const [data,count] = await prisma.$transaction([
-
-  prisma.student.findMany({
-     where:query,
-      include:{
-        class:true
-      },
-      take:ITEMS_PER_PAGE,
-      skip: ITEMS_PER_PAGE*(p-1),
-
-      
-    }),
-
-     prisma.student.count({where:query})
+      }
+    }
     
-  ])
-
+    const [data,count] = await prisma.$transaction([
+      
+      //remmeber prisma doesnot fetch relations automatically 
+      prisma.student.findMany({
+        where:query,
+        include:{
+          class:true
+        },
+        take:ITEMS_PER_PAGE,
+        skip: ITEMS_PER_PAGE*(p-1),
+        
+        
+      }),
+      
+      prisma.student.count({where:query})
+      
+    ])
+    
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}

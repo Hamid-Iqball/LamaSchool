@@ -120,3 +120,33 @@ export const subjectColumns =[
     accessor:"actions"
   }
 ]
+
+export const classesList =[
+  {
+    header:"Class Name", accessor:"name"
+
+  },
+  {
+    header:"Capacity", 
+    accessor:"capacity", 
+    className:"hidden md:table-cell"
+ 
+
+  },
+  {
+    header:"Grade", 
+    accessor:"grade", 
+    className:"hidden md:table-cell"
+
+  },
+  
+  {
+    header:"Supervisor", 
+    accessor:"superbisor", 
+    className:"hidden md:table-cell"
+  },
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]
