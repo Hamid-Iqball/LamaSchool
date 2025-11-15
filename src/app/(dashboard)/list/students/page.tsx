@@ -30,7 +30,9 @@ const renderRow = (item:studendList)=>(
   <td>
     <div className="flex items-center gap-2">
     {  role==="admin" && <>
-     <FormModal type="update"  table="student" data={item}  />
+    <Link href={`/list/students/${item.id}`}>
+       <Image src="/view.png" alt=""  width={30} height={30} className="p-1 rounded-xl hover:cursor-pointer"  />
+    </Link>
        
       <FormModal type="delete"  table="student" id={item.id}  /> </>}
         

@@ -150,3 +150,30 @@ export const classesList =[
     accessor:"actions"
   }
 ]
+
+
+export const lessonColumns =[
+  {
+    header:"Subject Name", accessor:"name"
+
+  },
+  {
+    header:"Class Name", 
+    accessor:"class", 
+  
+ 
+
+  },
+  {
+    header:"Teacher", 
+    accessor:"teaacher", 
+    className:"hidden md:table-cell"
+
+  },
+  
+  
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]

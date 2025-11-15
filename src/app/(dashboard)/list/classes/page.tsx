@@ -22,9 +22,9 @@ const renderRow = (item:Classes)=>(
   
   </td>
       <td className="hidden md:table-cell"> {item.capacity}</td>
-    <td className="hidden md:table-cell">{item.gradeId}</td>
+    <td className="hidden md:table-cell">{item.name[0]}</td>
 
-    <td className="hidden md:table-cell">{item.supervisorId}</td>
+    <td className="hidden md:table-cell">{item.supervisor?.name}</td>
   
   <td>
     <div className="flex items-center gap-2">

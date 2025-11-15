@@ -18,21 +18,6 @@ function SignleStudentPage() {
                 <div className="w-1/3">
                 <Image alt="" src="" width={120} height={144} className="w-36 h-36 rounded-full object-cover"/> </div>
 
-                {/* <div className="flex items-center">
-                     <FormModal table="student" type="create" data={{
-                        id: 1,
-                        username: "jrodriguez",
-                        email: "jrodriguez@school.edu",
-                        password: "securepassword123",
-                        firstName: "Julia",
-                        lastName: "Rodriguez",
-                        img: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1200",
-                        phone: "5551234567",
-                        address: "289 Cedar Avenue, Oakwood Heights, NY 10301",
-                        bloodtype: "O+",
-                        birthday: "1985-06-12",
-                    }}/>
-                </div> */}
                 <div className="w-2/3 flex flex-col justify-between gap-4 ">
                 <h1 className="text-3xl font-semibold">Hamid Iqbal</h1>
                 <p className="text-sm text-black text-wrap">Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
@@ -104,7 +89,7 @@ function SignleStudentPage() {
             <h1 className="text-xl font-semibold">Shorcuts</h1>
             <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500">
                 <Link href="/" className="p-3 rounded-md bg-lamaSky">Students&apos;s Results</Link>
-                <Link href={`/list/teachers/classId`} className="p-3 rounded-md bg-lamaPurpleLight">Students&apos;s Lessons</Link>
+                <Link href={`/list/lessons?classId=${2}`} className="p-3 rounded-md bg-lamaPurpleLight">Students&apos;s Lessons</Link>
                 <Link href="/" className="p-3 rounded-md bg-lamaYellowLight">Students&apos;s Teachers</Link>
                 <Link href="/" className="p-3 rounded-md bg-pink-50">Students&apos;s Exams</Link>
                 <Link href="/" className="p-3 rounded-md bg-lamaSkyLight">Students&apos;s Assignments</Link>
