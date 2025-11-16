@@ -177,3 +177,112 @@ export const lessonColumns =[
     accessor:"actions"
   }
 ]
+
+
+export const examColumns =[
+  {
+    header:"Subject Name",
+     accessor:"name"
+
+  },
+  {
+    header:"Class", 
+    accessor:"class", 
+    // className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Teacher", 
+    accessor:"teacher", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Date", 
+    accessor:"date", 
+    className:"hidden md:table-cell"
+
+  },
+
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]
+
+
+export const assignmentColumns =[
+  {
+    header:"Subject Name",
+     accessor:"name"
+
+  },
+  {
+    header:"Class", 
+    accessor:"class", 
+    // className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Teacher", 
+    accessor:"teacher", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Due Date", 
+    accessor:"dueDate", 
+    className:"hidden md:table-cell"
+
+  },
+
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]
+
+
+
+export const resultColumns =[
+  {
+    header:"Title",
+     accessor:"title"
+
+  },
+  {
+    header:"Student", 
+    accessor:"student", 
+    // className:"hidden md:table-cell"
+
+  },
+  {
+      header:"Teacher", 
+      accessor:"teacher", 
+      className:"hidden md:table-cell"
+      
+    },
+    {
+        header:"Score", 
+        accessor:"score", 
+        className:"hidden md:table-cell"
+        
+    },
+    {
+      header:"Class",
+      accessor:"class",
+      className:"hidden md:table-cell"
+  
+    },
+  {
+    header:"Date", 
+    accessor:"date", 
+    className:"hidden md:table-cell"
+
+  },
+
+  {
+    header:"Actions",
+    accessor:"actions"
+  }
+]

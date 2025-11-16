@@ -110,8 +110,8 @@ function SignleTeacherPage() {
                 <Link href={`/list/classes?supervisorId=${"teacher12"}`} className="p-3 rounded-md bg-lamaSky">Teacher&apos;s Classes</Link>
                 <Link href={`/list/students?teacherId=${"teacher2"}`} className="p-3 rounded-md bg-lamaPurpleLight" >Teacher&apos;s Students</Link>
                 <Link href={`/list/lessons?teacherId=${"teacher2"}`} className="p-3 rounded-md bg-lamaYellowLight">Teacher&apos;s Lessons</Link>
-                <Link href="/" className="p-3 rounded-md bg-pink-50">Teacher&apos;s Exam</Link>
-                <Link href="/" className="p-3 rounded-md bg-lamaSkyLight">Teacher&apos;s Assignments</Link>
+                <Link href={`/list/exams?teacherId=${"teacher3"}`} className="p-3 rounded-md bg-pink-50">Teacher&apos;s Exam</Link>
+                <Link href={`/list/assignments?teacherId=${"teacher3"}`} className="p-3 rounded-md bg-lamaSkyLight">Teacher&apos;s Assignments</Link>
             </div>
         </div>
         <Performance/>

@@ -3,59 +3,28 @@ import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
 import { examsData, parentsData, role, studentsData, subjectsData, teachersData } from "@/lib/data"
-
+import { Class, Exam, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
+import { examColumns as columns  } from "@/lib/contants"
 import Image from "next/image"
 import Link from "next/link"
+import prisma from "@/lib/prisma"
+import { ITEMS_PER_PAGE } from "@/lib/settings"
 
-type Exam ={
-  id:number;
-  subject:string;
-  teacher:string;
-  class:string;
-  date:string
+type examList = Exam & {lesson:{
+  subject:Subject,
+  class:Class,
+  teacher:Teacher
+}}
 
-
-}
-const columns =[
-  {
-    header:"Subject Name",
-     accessor:"name"
-
-  },
-  {
-    header:"Class", 
-    accessor:"class", 
-    // className:"hidden md:table-cell"
-
-  },
-  {
-    header:"Teacher", 
-    accessor:"teacher", 
-    className:"hidden md:table-cell"
-
-  },
-  {
-    header:"Date", 
-    accessor:"date", 
-    className:"hidden md:table-cell"
-
-  },
-
-  {
-    header:"Actions",
-    accessor:"actions"
-  }
-]
-
-const renderRow = (item:Exam)=>(
+const renderRow = (item:examList)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   
   <td className="flex items-center gap-4 p-4">
-      <h3 className="font-semibold">{item.subject}</h3>
+      <h3 className="font-semibold">{item.lesson.subject.name}</h3>
      </td>
-    <td >{item.class}</td>
-    <td className="hidden md:table-cell">{item.teacher}</td>
-    <td className="hidden md:table-cell">{item.date}</td>
+    <td >{item.lesson.class.name}</td>
+    <td className="hidden md:table-cell">{item.lesson.teacher.name}</td>
+    <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)}</td>
    
 
 
@@ -73,7 +42,92 @@ const renderRow = (item:Exam)=>(
 </tr>
 )
 
-function  SubjectsList() {
+async function  examList({searchParams}:{
+  searchParams: {[key:string]: string | undefined}
+}) {
+
+
+
+  const {page ,...queryParams} = searchParams
+  const p = page? parseInt(page) : 1
+  
+  const query: Prisma.ExamWhereInput = {}
+  //this logic is for the query
+      if(queryParams){
+        for(const [key,value] of Object.entries(queryParams)){
+          if(value !== undefined){
+            switch (key) {
+              case "teacherId":
+               query.lesson ={
+                teacherId:value
+               }
+              break;
+
+              // case "studentId":{
+              //   query.lesson={
+              //   classId:=s
+              //   }
+              // }
+
+         
+           case "search":
+            query.OR = [
+             {lesson:
+              {subject:{name:{
+                contains:value, mode:"insensitive"
+              }}},
+            }
+            ,
+            {lesson:
+
+              {teacher:{name:{
+                contains:value, mode:"insensitive"
+              }}},
+            },
+            {lesson:
+
+              {class:{name:{
+                contains:value, mode:"insensitive"
+              }}},
+            }
+            ]
+            break;
+
+            
+            default:
+                break;
+              }
+            }
+          }
+        }
+    
+
+        // This is prisma interaction function
+    const [data,count] = await prisma.$transaction([
+      
+      //remmeber prisma doesnot fetch relations automatically we have to mention it in the query
+      prisma.exam.findMany({
+        where:query,
+        include:{
+          lesson:{
+            include:{
+              teacher:{select:{name:true, surname:true}},
+              class:{select:{name:true}},
+              subject:{select:{name:true,}}
+              
+            }
+          }
+        },
+        take:ITEMS_PER_PAGE,
+        skip: ITEMS_PER_PAGE*(p-1),
+        
+        
+      }),
+      
+      prisma.exam.count({where:query})
+      
+    ])
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
@@ -94,14 +148,14 @@ function  SubjectsList() {
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={examsData}/>
+      <Table columns={columns} renderRow={renderRow} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">
-      <Paginations />
+    <Paginations count={count} page={p} />
     </div>
     </div>
   )
 }
 
-export default SubjectsList
+export default examList
