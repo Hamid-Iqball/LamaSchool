@@ -30,8 +30,8 @@ const renderRow = (item:resultList)=>(
 {item.title}
      </td>
     <td >{item.studentName}</td>
-    <td className="hidden md:table-cell">{item.score}</td>
     <td className="hidden md:table-cell">   {item.teacherName}</td>
+    <td className="hidden md:table-cell">{item.score}</td>
     <td  className="hidden md:table-cell">   {item.className}</td>
     <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)}</td>
    
@@ -58,51 +58,55 @@ async function SubjectsList({searchParams}:{
   
   const query: Prisma.ResultWhereInput = {}
   //this logic is for the query
-      // if(queryParams){
-      //   for(const [key,value] of Object.entries(queryParams)){
-      //     if(value !== undefined){
-      //       switch (key) {
-      //         case "teacherId":
-      //          query.result ={
-      //           teacherId:value
-      //          }
-      //         break;
+      if(queryParams){
+        for(const [key,value] of Object.entries(queryParams)){
+          if(value !== undefined){
+         switch (key) {
+          case "studentId":
+          query.studentId = value
+              break;
 
-      //         case "studentId":{
-      //          query.result = {classId:parseInt(value)}
-      //         }
 
-         
-      //      case "search":
-      //       query.OR = [
-      //        {result:
-      //         {subject:{name:{
-      //           contains:value, mode:"insensitive"
-      //         }}},
-      //       }
-      //       ,
-      //       {result:
 
-      //         {teacher:{name:{
-      //           contains:value, mode:"insensitive"
-      //         }}},
-      //       },
-      //       {result:
+           case "search":
+            query.OR = [
+             {exam:
+              {title:{
+                contains:value, mode:"insensitive"
+              }},
+            }
+            ,
+            {assignment:
 
-      //         {class:{name:{
-      //           contains:value, mode:"insensitive"
-      //         }}},
-      //       }
-      //       ]
-      //       break;
+              {title:{
+                contains:value, mode:"insensitive"
+              }},
+            },
+            {student:
+              {name:{
+                contains:value, mode:"insensitive"
+              }},
+            },
+          {
+            exam:{
+              lesson:{
+                teacher:{name:{
+                  contains:value, mode:"insensitive"
+                }}
+              }
+            }
+          }
+            
+            ]
+            break;
 
             
-      //       default:
-      //           break;
-      //         }
-      //       }
-      //     }
-      //   }
+            default:
+                break;
+              }
+            }
+          }
+        }
 
               // This is prisma interaction function
     const [dataResponse,count] = await prisma.$transaction([

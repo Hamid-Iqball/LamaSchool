@@ -88,7 +88,7 @@ function SignleStudentPage() {
         <div className="bg-white p-4 rounded-md">
             <h1 className="text-xl font-semibold">Shorcuts</h1>
             <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500">
-                <Link href="/" className="p-3 rounded-md bg-lamaSky">Students&apos;s Results</Link>
+                <Link href={`/list/results?studentId=${"student2"}`} className="p-3 rounded-md bg-lamaSky">Students&apos;s Results</Link>
                 <Link href={`/list/lessons?classId=${2}`} className="p-3 rounded-md bg-lamaPurpleLight">Students&apos;s Lessons</Link>
                 <Link href={`/list/lessons?classId=${2}`} className="p-3 rounded-md bg-lamaYellowLight">Students&apos;s Teachers</Link>
                 <Link href={`/list/lessons?classId=${2}`} className="p-3 rounded-md bg-pink-50">Students&apos;s Exams</Link>
