@@ -2,9 +2,26 @@
 
 import * as Clerk from '@clerk/elements/common'
 import * as SignIn from '@clerk/elements/sign-in'
+import { useUser } from '@clerk/nextjs'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
-function loginPage() {
+import { useEffect } from 'react'
+
+function LoginPage() {
+
+  const { isSignedIn, user, isLoaded } = useUser()
+   const router = useRouter() 
+
+    useEffect(function(){
+        const role = user?.publicMetadata.role
+        if(role){
+            router.push(`/${role}`)
+
+        }
+    },[user,router])
+
+
   return (
     <div className='flex items-center justify-center h-screen bg-lamaSkyLight'>
         <SignIn.Root>
@@ -54,4 +71,4 @@ function loginPage() {
   )
 }
 
-export default loginPage
+export default LoginPage
