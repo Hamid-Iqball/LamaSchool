@@ -3,18 +3,18 @@ import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
 import { classesList as columns } from "@/lib/contants"
-import { classesData, role,  } from "@/lib/data"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { auth, currentUser } from "@clerk/nextjs/server"
 import { Class, Prisma, Teacher } from "@prisma/client"
 
 import Image from "next/image"
-import Link from "next/link"
 
 type Classes = Class & {supervisor:Teacher | null} //types of model and the value from another models as well
 
 
-const renderRow = (item:Classes)=>(
+
+const renderRow = (item:Classes, role:string)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   <td className="flex items-center gap-4 p-4">
     
@@ -41,12 +41,12 @@ const renderRow = (item:Classes)=>(
 async function ClassList({searchParams}:{
   searchParams:{[key:string] : string | undefined}
 }) {
+ const user = await currentUser()
+const role = user?.publicMetadata.role as string
 
   const {page,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
-
-
- const query:Prisma.ClassWhereInput ={}
+  const query:Prisma.ClassWhereInput ={}
 
 
   if(searchParams){
@@ -89,6 +89,36 @@ async function ClassList({searchParams}:{
    ])
 
 
+    const columns =[
+  {
+    header:"Class Name", accessor:"name"
+
+  },
+  {
+    header:"Capacity", 
+    accessor:"capacity", 
+    className:"hidden md:table-cell"
+ 
+
+  },
+  {
+    header:"Grade", 
+    accessor:"grade", 
+    className:"hidden md:table-cell"
+
+  },
+  
+  {
+    header:"Supervisor", 
+    accessor:"superbisor", 
+    className:"hidden md:table-cell"
+  },
+  ...(role==="admin"?[{
+    header:"Actions",
+    accessor:"actions"
+  }]:[])
+]
+
 
 
   return (
@@ -111,7 +141,9 @@ async function ClassList({searchParams}:{
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table columns={columns} renderRow={
+        (item)=> renderRow(item,role)
+      } data={data}/>
     </div>
     {/* Pagination */}
     <div className="">

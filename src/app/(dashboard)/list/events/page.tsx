@@ -5,50 +5,15 @@ import TableSearch from "@/components/TableSearch"
 import { eventsData, examsData, parentsData, resultsData, role, studentsData, subjectsData, teachersData } from "@/lib/data"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { auth } from "@clerk/nextjs/server"
 import { Class, Event, Prisma } from "@prisma/client"
 import Image from "next/image"
 
 
 type EventList = Event &{class:Class}
-const columns =[
-  {
-    header:"Title",
-     accessor:"title"
 
-  },
-  
-    {
-      header:"Class",
-      accessor:"class",
-      className:"hidden md:table-cell"
-  
-    },
-  {
-    header:"Date", 
-    accessor:"date", 
-    className:"hidden md:table-cell"
 
-  },
-  {
-    header:"Start Time", 
-    accessor:"starttime", 
-    className:"hidden md:table-cell"
-
-  },
-  {
-    header:"End Time", 
-    accessor:"endtime", 
-    className:"hidden md:table-cell"
-
-  },
-
-  {
-    header:"Actions",
-    accessor:"actions"
-  }
-]
-
-const renderRow = (item:EventList)=>(
+const renderRow = (item:EventList, role:string)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   
   <td className="flex items-center gap-4 p-4">
@@ -89,7 +54,10 @@ async function EventListPage({searchParams}:{
 }) {
 
 
+  const {sessionClaims} =  await auth()
+  const role = sessionClaims?.role as string
 
+  console.log(role)
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
   
@@ -129,6 +97,47 @@ async function EventListPage({searchParams}:{
       prisma.event.count({where:query})
       
     ])
+
+    const columns =[
+      {
+        header:"Title",
+        accessor:"title"
+
+      },
+      
+        {
+          header:"Class",
+          accessor:"class",
+          className:"hidden md:table-cell"
+      
+        },
+      {
+        header:"Date", 
+        accessor:"date", 
+        className:"hidden md:table-cell"
+
+      },
+      {
+        header:"Start Time", 
+        accessor:"starttime", 
+        className:"hidden md:table-cell"
+
+      },
+      {
+        header:"End Time", 
+        accessor:"endtime", 
+        className:"hidden md:table-cell"
+
+      },
+
+     ...(role === "admin" ? [
+      {
+        header:"Actions",
+        accessor:"actions"
+      }
+    ] : [] )
+    ]
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
@@ -149,7 +158,9 @@ async function EventListPage({searchParams}:{
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table columns={columns} renderRow={
+        (item)=>renderRow(item,role)
+      } data={data}/>
     </div>
     {/* Pagination */}
     <div className="">
