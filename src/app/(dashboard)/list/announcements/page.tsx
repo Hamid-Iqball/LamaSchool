@@ -2,55 +2,28 @@ import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
-import { announcementsData, eventsData, examsData, parentsData, resultsData, role, studentsData, subjectsData, teachersData } from "@/lib/data"
+import { announcementsData, eventsData, examsData, parentsData, resultsData, studentsData, subjectsData, teachersData } from "@/lib/data"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { auth } from "@clerk/nextjs/server"
 import { Announcement, Class, Prisma } from "@prisma/client"
-
 import Image from "next/image"
-import Link from "next/link"
+
+
+
 
 type AnnouncementList = Announcement & {class:Class}
-const columns =[
-  {
-    header:"Title",
-     accessor:"title"
 
-  },
-  
-    {
-      header:"Class",
-      accessor:"class",
-      className:"hidden md:table-cell"
-  
-    },
-  {
-    header:"Date", 
-    accessor:"date", 
-    className:"hidden md:table-cell"
 
-  },
-  {
-    header:"Actions",
-    accessor:"actions"
-  }
-]
-
-const renderRow = (item:AnnouncementList)=>(
+const renderRow = (item:AnnouncementList, role:string|undefined)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   
   <td className="flex items-center gap-4 p-4">
    {item.title}
      </td>
     <td >{item.class.name}</td>
-    <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.date)}</td>
- 
-    
-   
-
-
- 
-  <td>
+    <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.date)}</td> 
+    <td>
     <div className="flex items-center gap-2">
     {  role==="admin" && <>
      <FormModal type="update"  table="announcement" data={item}  />
@@ -58,7 +31,7 @@ const renderRow = (item:AnnouncementList)=>(
       <FormModal type="delete"  table="announcement" id={item.id}  /> </>}
         
     </div>
-  </td>
+    </td>
 </tr>
 )
 
@@ -66,6 +39,9 @@ async function  Announements({searchParams}:{
   searchParams: {[key:string]: string | undefined}
 }) {
 
+
+  const {sessionClaims} = await auth()
+  const role =  (sessionClaims?.publiMetadata as {role:string} | undefined)?.role
 
 
   const {page ,...queryParams} = searchParams
@@ -107,6 +83,33 @@ async function  Announements({searchParams}:{
       prisma.announcement.count({where:query})
       
     ])
+
+const columns =[
+  {
+    header:"Title",
+     accessor:"title"
+
+  },
+  
+    {
+      header:"Class",
+      accessor:"class",
+      className:"hidden md:table-cell"
+  
+    },
+  {
+    header:"Date", 
+    accessor:"date", 
+    className:"hidden md:table-cell"
+
+  },
+ ...(role==="admin"? [{
+    header:"Actions",
+    accessor:"actions"
+  }] : [])
+]
+
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
@@ -127,7 +130,11 @@ async function  Announements({searchParams}:{
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table
+          columns={columns}
+          renderRow={(item: AnnouncementList) => renderRow(item, role)}
+          data={data}
+        />
     </div>
     {/* Pagination */}
     <div className="">
