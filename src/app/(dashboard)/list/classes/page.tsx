@@ -71,6 +71,9 @@ const role = user?.publicMetadata.role as string
   }
 
 
+
+
+
    const [data,count] = await prisma.$transaction([
 
     prisma.class.findMany({
@@ -82,14 +85,11 @@ const role = user?.publicMetadata.role as string
       skip:ITEMS_PER_PAGE*(p-1)
     }
     ),
-
-
-
     prisma.class.count({where:query})
    ])
 
 
-    const columns =[
+  const columns =[
   {
     header:"Class Name", accessor:"name"
 
@@ -118,6 +118,8 @@ const role = user?.publicMetadata.role as string
     accessor:"actions"
   }]:[])
 ]
+
+//ROLE CONDITION
 
 
 

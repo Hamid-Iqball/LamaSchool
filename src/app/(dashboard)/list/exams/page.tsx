@@ -9,6 +9,7 @@ import Image from "next/image"
 import Link from "next/link"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { auth } from "@clerk/nextjs/server"
 
 type examList = Exam & {lesson:{
   subject:Subject,
@@ -45,30 +46,35 @@ const renderRow = (item:examList)=>(
 async function  examList({searchParams}:{
   searchParams: {[key:string]: string | undefined}
 }) {
-
-
-
-  const {page ,...queryParams} = searchParams
-  const p = page? parseInt(page) : 1
   
-  const query: Prisma.ExamWhereInput = {}
+
+   const { userId, sessionClaims } = await auth()
+   const role = (sessionClaims?.metadata as {role:string})?.role 
+   
+   
+   const {page ,...queryParams} = searchParams
+   const p = page? parseInt(page) : 1
+   
+   const query: Prisma.ExamWhereInput = {}
+   
+   query.lesson={}
   //this logic is for the query
       if(queryParams){
         for(const [key,value] of Object.entries(queryParams)){
           if(value !== undefined){
             switch (key) {
               case "teacherId":
-               query.lesson ={
+              query.lesson= {
                 teacherId:value
-               }
+              }
               break;
 
-              // case "studentId":{
-              //   query.lesson={
-              //   classId:=s
-              //   }
-              // }
-
+              case "classId":{
+               query.lesson={
+                classId:parseInt(value)
+               }
+              }
+            break;
          
            case "search":
             query.OR = [
@@ -102,6 +108,17 @@ async function  examList({searchParams}:{
         }
     
 
+      // Role Condition
+      switch (role) {
+        case "admin":
+          break;
+       case "teacher":
+        query.lesson.teacherId = userId!
+        break;
+        default:
+          break;
+      }
+
         // This is prisma interaction function
     const [data,count] = await prisma.$transaction([
       
@@ -127,6 +144,36 @@ async function  examList({searchParams}:{
       prisma.exam.count({where:query})
       
     ])
+        const columns=[
+  {
+    header:"Subject Name",
+     accessor:"name"
+
+  },
+  {
+    header:"Class", 
+    accessor:"class", 
+    // className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Teacher", 
+    accessor:"teacher", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Date", 
+    accessor:"date", 
+    className:"hidden md:table-cell"
+
+  },
+
+  ...([{
+    header:"Actions",
+    accessor:"actions"
+  }])
+]
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">

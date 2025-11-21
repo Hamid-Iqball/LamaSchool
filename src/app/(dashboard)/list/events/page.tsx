@@ -19,7 +19,7 @@ const renderRow = (item:EventList, role:string)=>(
   <td className="flex items-center gap-4 p-4">
    {item.title}
      </td>
-    <td >{item.class.name}</td>
+    <td >{item.class?.name || "-"}</td>
     <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)}</td>
     <td className="hidden md:table-cell">{item.startTime.toLocaleString("en-US", {
       hour:"2-digit",
@@ -54,10 +54,11 @@ async function EventListPage({searchParams}:{
 }) {
 
 
-  const {sessionClaims} =  await auth()
-  const role = sessionClaims?.role as string
+ const { userId, sessionClaims } = await auth()
+  const role = (sessionClaims?.metadata as {role:string})?.role 
 
-  console.log(role)
+
+  console.log('roless',role)
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
   
@@ -78,8 +79,35 @@ async function EventListPage({searchParams}:{
               }
             }
           }
+
+
+          //ROLE CONDITION
+
+          // switch (role) {
+          //   case "admin":
+          //     break;
+
+          //     case "teacher":
+          //       query.OR=[
+          //         {class:null},
+          //         {class:{lessons:{some:{teacherId:userId!}}}}
+          //       ]
+          
+          //   default:
+          //     break;
+          // }
         
-    
+    const roleConditions={
+      teacher:{lessons:{some:{teacherId:userId!}}},
+      student:{student:{some:{id:userId!}}},
+      parent:{lessons:{some:{parentId:userId!}}},
+    }
+
+
+    query.OR=[
+      {classId:null},
+      {class:roleConditions[role as keyof typeof roleConditions] ||{}}
+    ]
 
         // This is prisma interaction function
     const [data,count] = await prisma.$transaction([
