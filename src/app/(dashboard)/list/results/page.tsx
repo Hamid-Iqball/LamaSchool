@@ -2,16 +2,14 @@ import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
-import { examsData, parentsData, resultsData, role, studentsData, subjectsData, teachersData } from "@/lib/data"
 import { Class, Prisma, Result, Subject, Teacher } from "@prisma/client"
-import { resultColumns as columns } from "@/lib/contants"
 import Image from "next/image"
-import Link from "next/link"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { auth } from "@clerk/nextjs/server"
 
 type resultList = {
-      id:number,
+        id:number,
         title:string;
         studentName:string;
         studentSurname:string;
@@ -23,7 +21,7 @@ type resultList = {
 }
 
 
-const renderRow = (item:resultList)=>(
+const renderRow = (item:resultList, role:string)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   
   <td className="flex items-center gap-4 p-4">
@@ -38,7 +36,7 @@ const renderRow = (item:resultList)=>(
 
   <td>
     <div className="flex items-center gap-2">
-    {  role==="admin" && <>
+    {  (role==="admin" || role==="teacher") && <>
      <FormModal type="update"  table="result" data={item}  />
       <FormModal type="delete"  table="result" id={item.id}  /> </>}
         
@@ -51,7 +49,10 @@ async function SubjectsList({searchParams}:{
   searchParams: {[key:string]: string | undefined}
 }) {
 
+  const {userId,sessionClaims} = await auth()
+  const role =  (sessionClaims?.metadata as {role:string})?.role
 
+  console.log("role", role)
 
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
@@ -66,9 +67,7 @@ async function SubjectsList({searchParams}:{
           query.studentId = value
               break;
 
-
-
-           case "search":
+          case "search":
             query.OR = [
              {exam:
               {title:{
@@ -77,7 +76,6 @@ async function SubjectsList({searchParams}:{
             }
             ,
             {assignment:
-
               {title:{
                 contains:value, mode:"insensitive"
               }},
@@ -96,7 +94,6 @@ async function SubjectsList({searchParams}:{
               }
             }
           }
-            
             ]
             break;
 
@@ -108,10 +105,34 @@ async function SubjectsList({searchParams}:{
           }
         }
 
-              // This is prisma interaction function
+
+        switch (role) {
+      case "admin":
+        break;
+      case "teacher":
+        query.OR= [
+          {exam:{lesson:{teacherId:userId!}}},
+          {assignment:{ lesson:{teacherId:userId!}}}
+        ]
+        break;
+
+        case "student":
+          query.studentId = userId!
+          break;
+
+
+        case "parent":
+          query.student ={ parentId:userId!}
+          break;
+
+      default:
+        break;
+    }
+
+    // This is prisma interaction function
     const [dataResponse,count] = await prisma.$transaction([
       
-      //remmeber prisma doesnot fetch relations automatically we have to mention it in the query
+      //Prisma doesnot fetch relations automatically we have to mention it in the query
       prisma.result.findMany({
         where:query,
         include:{
@@ -129,7 +150,6 @@ async function SubjectsList({searchParams}:{
 
         assignment:{
           include:{
-
             lesson:{
               select:{
                 teacher:{select:{name:true, surname:true}},
@@ -150,6 +170,11 @@ async function SubjectsList({searchParams}:{
     ])
 
 
+
+    //role based condition
+
+    
+
     const data =  dataResponse.map(item=>{
       const assisment = item.exam || item.assignment
       if(!assisment) return null
@@ -169,7 +194,54 @@ async function SubjectsList({searchParams}:{
       }
     }
     )
+
+
+ const columns =[
+  {
+    header:"Title",
+     accessor:"title"
+
+  },
+  {
+    header:"Student", 
+    accessor:"student", 
+    // className:"hidden md:table-cell"
+
+  },
+  {
+      header:"Teacher", 
+      accessor:"teacher", 
+      className:"hidden md:table-cell"
+      
+    },
+    {
+        header:"Score", 
+        accessor:"score", 
+        className:"hidden md:table-cell"
+        
+    },
+    {
+      header:"Class",
+      accessor:"class",
+      className:"hidden md:table-cell"
+  
+    },
+  {
+    header:"Date", 
+    accessor:"date", 
+    className:"hidden md:table-cell"
+
+  },
+
+ ...((role==="admin" ||role==="teacher")? [{
+    header:"Actions",
+    accessor:"actions"
+  }]:[])
+]
     
+
+
+
 
 
   return (
@@ -192,7 +264,7 @@ async function SubjectsList({searchParams}:{
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table columns={columns} renderRow={(item)=>renderRow(item,role)} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">

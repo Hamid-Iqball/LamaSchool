@@ -2,9 +2,8 @@ import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
-import { examsData, parentsData, role, studentsData, subjectsData, teachersData } from "@/lib/data"
 import { Class, Exam, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
-import { examColumns as columns  } from "@/lib/contants"
+
 import Image from "next/image"
 import Link from "next/link"
 import prisma from "@/lib/prisma"
@@ -17,7 +16,7 @@ type examList = Exam & {lesson:{
   teacher:Teacher
 }}
 
-const renderRow = (item:examList)=>(
+const renderRow = (item:examList, role:string)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   
   <td className="flex items-center gap-4 p-4">
@@ -26,10 +25,7 @@ const renderRow = (item:examList)=>(
     <td >{item.lesson.class.name}</td>
     <td className="hidden md:table-cell">{item.lesson.teacher.name}</td>
     <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)}</td>
-   
-
-
- 
+  
   <td>
     <div className="flex items-center gap-2">
     
@@ -63,25 +59,18 @@ async function  examList({searchParams}:{
         for(const [key,value] of Object.entries(queryParams)){
           if(value !== undefined){
             switch (key) {
-              case "teacherId":
-              query.lesson= {
-                teacherId:value
+              case "classId":{
+               query.lesson.classId = parseInt(value)
               }
               break;
+              case "teacherId":
+             query.lesson.teacherId= value
+              break;
 
-              case "classId":{
-               query.lesson={
-                classId:parseInt(value)
-               }
-              }
-            break;
          
            case "search":
-            query.OR = [
-             {lesson:
-              {subject:{name:{
-                contains:value, mode:"insensitive"
-              }}},
+            query.lesson.subject= {
+              name:{contains:value,  mode:"insensitive"}
             }
             ,
             {lesson:
@@ -96,7 +85,7 @@ async function  examList({searchParams}:{
                 contains:value, mode:"insensitive"
               }}},
             }
-            ]
+            
             break;
 
             
@@ -109,12 +98,32 @@ async function  examList({searchParams}:{
     
 
       // Role Condition
-      switch (role) {
-        case "admin":
+    switch (role) {
+      case "admin":
           break;
-       case "teacher":
+      case "teacher":
         query.lesson.teacherId = userId!
         break;
+      case "student":
+        query.lesson.class ={
+         students:{
+          some:{
+            id:userId!
+          }
+         }
+        }
+        break;
+
+        case "parent":
+          query.lesson.class={
+            students:{
+              some:{
+                parentId:userId!
+              }
+            }
+          }
+          break;
+
         default:
           break;
       }
@@ -136,9 +145,7 @@ async function  examList({searchParams}:{
           }
         },
         take:ITEMS_PER_PAGE,
-        skip: ITEMS_PER_PAGE*(p-1),
-        
-        
+        skip: ITEMS_PER_PAGE*(p-1),   
       }),
       
       prisma.exam.count({where:query})
@@ -160,19 +167,17 @@ async function  examList({searchParams}:{
     header:"Teacher", 
     accessor:"teacher", 
     className:"hidden md:table-cell"
-
   },
   {
     header:"Date", 
     accessor:"date", 
     className:"hidden md:table-cell"
-
   },
 
-  ...([{
+  ...(role==="admin"?[{
     header:"Actions",
     accessor:"actions"
-  }])
+  }]:[])
 ]
 
   return (
@@ -189,13 +194,13 @@ async function  examList({searchParams}:{
         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
           <Image src="/sort.png" alt="" width={14} height={14} />
         </button>
-       { role === "admin" && <FormModal table="exam" type="create"/>}
+       { (role === "admin" || role==="teacher") && <FormModal table="exam" type="create"/>}
       </div>
     </div>
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table columns={columns} renderRow={(item)=>renderRow(item,role)} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">

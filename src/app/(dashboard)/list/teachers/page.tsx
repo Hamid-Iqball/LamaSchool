@@ -10,12 +10,13 @@ import { headers } from "next/headers"
 import Image from "next/image"
 import { teacherColumns as columns } from "@/lib/contants"
 import Link from "next/link"
+import { auth } from "@clerk/nextjs/server"
 
 
 type TeachersList = Teacher & {subjects:Subject[]} & {classes:Class[]}
 
 
-const renderRow = (item:TeachersList)=>(
+const renderRow = (item:TeachersList, role:string)=>(
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   <td className="flex items-center gap-4 p-4">
     <Image src={item.img || "/avatar.png"} alt="" width={40} height={40} 
@@ -52,6 +53,9 @@ async function TeachersList({searchParams}:{
   searchParams:{[key:string]: | string |undefined} // index signature
 }) {
 
+
+  const {userId, sessionClaims} = await auth()
+  const role =  (sessionClaims?.metadata as {role:string}).role
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
 
@@ -100,6 +104,47 @@ async function TeachersList({searchParams}:{
       ])
 
 
+       const columns =[
+  {
+    header:"Info", accessor:"Info"
+
+  },
+  {
+    header:"Teacher ID", 
+    accessor:"teacherid", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Subjects", 
+    accessor:"subjects", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"classes", 
+    accessor:"classes", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Phone", 
+    accessor:"phone", 
+    className:"hidden lg:table-cell"
+
+  },
+  {
+    header:"Address", 
+    accessor:"address", 
+    className:"hidden lg:table-cell"
+
+  },
+  ...(role==="admin"?[{
+    header:"Actions",
+    accessor:"actions"
+  }]:[])
+]
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
@@ -125,7 +170,7 @@ async function TeachersList({searchParams}:{
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table columns={columns} renderRow={(item)=>renderRow(item,role)} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">

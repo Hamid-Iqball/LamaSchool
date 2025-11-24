@@ -2,19 +2,17 @@ import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
-import { studnetColumns as columns} from "@/lib/contants"
-import { role, studentsData, teachersData } from "@/lib/data"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
+import { auth } from "@clerk/nextjs/server"
 import { Class, Prisma, Student } from "@prisma/client"
-import { headers } from "next/headers"
-
 import Image from "next/image"
 import Link from "next/link"
 
+
 type studendList = Student & {class:Class}
 
-const renderRow = (item:studendList)=>(
+const renderRow = (item:studendList, role:string)=>(
   <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   <td className="flex items-center gap-4 p-4">
     <Image src={item.img || "/avatar.png"} alt="" width={40} height={40} 
@@ -46,7 +44,9 @@ async function StudentsList({searchParams}:{
   
 }) {
   
-  
+  const {userId, sessionClaims} = await auth()
+  const role =  (sessionClaims?.metadata as {role:string}).role
+
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
   
@@ -63,12 +63,11 @@ async function StudentsList({searchParams}:{
               teacherId: value
             }
           }
-          
       }
       break;
       
       
-      case "search":
+    case "search":
         query.name = {contains:value, mode:"insensitive"}
         break;
         
@@ -79,6 +78,15 @@ async function StudentsList({searchParams}:{
       }
     }
     
+
+    switch (role) {
+      case "admin":  
+        break;
+      case "teacher":
+        
+      default:
+        break;
+    }
     const [data,count] = await prisma.$transaction([
       
       //remmeber prisma doesnot fetch relations automatically 
@@ -96,6 +104,36 @@ async function StudentsList({searchParams}:{
       prisma.student.count({where:query})
       
     ])
+
+ const columns =[
+  {
+    header:"Info", accessor:"Info"
+
+  },
+  {
+    header:"Student ID", 
+    accessor:"studentId", 
+    className:"hidden md:table-cell"
+
+  },
+  {
+    header:"Grade", 
+    accessor:"grade", 
+    className:"hidden md:table-cell"
+
+  },
+  
+  {
+    header:"Address", 
+    accessor:"address", 
+    className:"hidden lg:table-cell"
+
+  },
+  ...(role==="admin"?[{
+    header:"Actions",
+    accessor:"actions"
+  }]:[])
+]
     
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
@@ -111,19 +149,17 @@ async function StudentsList({searchParams}:{
         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
           <Image src="/sort.png" alt="" width={14} height={14} />
         </button>
-       { role === "admin" && <FormModal table="student" type="create"/>}
+       { (role === "admin" || role==="teacher" )&& <FormModal table="student" type="create"/>}
       </div>
     </div>
     </div>
     {/* List */}
     <div>
-      <Table columns={columns} renderRow={renderRow} data={data}/>
+      <Table columns={columns} renderRow={(item)=>renderRow(item,role)} data={data}/>
     </div>
     {/* Pagination */}
     <div className="">
-      <Paginations page={p} count={
-    count
-      }/>
+      <Paginations page={p} count={count}/>
     </div>
     </div>
   )

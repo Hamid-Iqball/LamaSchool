@@ -24,3 +24,6 @@ export const RouteAccessMap:RouteAccessMap ={
     "/list/announcements":["admin", "teacher", "parent" , "student"],
     
 }
+
+
+//(.*) === "Match anything, including an empty string, of any length.”
