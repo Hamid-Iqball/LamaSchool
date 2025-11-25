@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 export const subjectColumns =[
   {
     header:"Subject Name", accessor:"name"

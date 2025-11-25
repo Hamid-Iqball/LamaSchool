@@ -8,7 +8,6 @@ import { ITEMS_PER_PAGE } from "@/lib/settings"
 import { Class, Prisma, Subject, Teacher } from "@prisma/client"
 import { headers } from "next/headers"
 import Image from "next/image"
-import { teacherColumns as columns } from "@/lib/contants"
 import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
 
@@ -56,6 +55,8 @@ async function TeachersList({searchParams}:{
 
   const {userId, sessionClaims} = await auth()
   const role =  (sessionClaims?.metadata as {role:string}).role
+
+  
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
 
