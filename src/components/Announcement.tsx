@@ -42,7 +42,6 @@ async function Announcement() {
     }
   })
 
-  console.log("announcements", data)
 
   return (
     <div className="bg-white p-4 rounded-md">
@@ -50,8 +49,8 @@ async function Announcement() {
         <h1 className="text-xl font-semibold">Announcement</h1>
         <Link href="/" className="text-xs text-gray-400">View All</Link>
       </div>
-{ data ?     <div className="flex flex-col gap-4 mt-4">
-        <div className="bg-lamaSkyLight rounded-md p-4">
+ <div className="flex flex-col gap-4 mt-4">
+       {data[0] &&( <div className="bg-lamaSkyLight rounded-md p-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">{data[0]?.title}</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
@@ -59,8 +58,8 @@ async function Announcement() {
             </span>
           </div>
           <p className="text-sm text-gray-400 mt-1">{data[0]?.description}</p>
-        </div>
-        <div className="bg-purple-100 rounded-md p-4">
+        </div>)}
+{     data[1] &&  <div className="bg-purple-100 rounded-md p-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">{data[1]?.title}</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
@@ -68,8 +67,8 @@ async function Announcement() {
             </span>
           </div>
           <p className="text-sm text-gray-400 mt-1">{data[1]?.description}</p>
-        </div>
-        <div className="bg-lamaSkyLight rounded-md p-4">
+        </div>}
+       { data[2] && <div className="bg-lamaSkyLight rounded-md p-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">{data[2]?.title}</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
@@ -77,12 +76,13 @@ async function Announcement() {
             </span>
           </div>
           <p className="text-sm text-gray-400 mt-1">{data[2]?.description}</p>
-        </div>
-      </div>:
-      <div className="flex justify-center items-center">
-        <p className="text-xl text-red-300">No Data to be shown</p>
-      </div>
-      }
+        </div>}
+
+        {data.length===0 && <div className="flex justify-center items-center">
+            <p className="text-red-300">There is no Annoucement for You!</p>
+            </div>}
+      </div> 
+      
     </div>
   )
 }
