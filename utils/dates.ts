@@ -45,6 +45,12 @@ return lessons.map((lesson)=>{
 
 
     const adjustStartDate =  new Date(startOfWeek)
+    adjustStartDate.setHours(
+        lesson.end.getHours(),
+        lesson.end.getMinutes(),
+        lesson.end.getSeconds()
+    )
+    
     adjustStartDate.setDate(startOfWeek.getDate()+ daysfromMonday);
     const adjustEndDate =  new Date(adjustStartDate)
     adjustEndDate.setHours(

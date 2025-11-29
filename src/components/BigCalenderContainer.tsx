@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma"
 import BigCalander from "./BigCalander"
+import { adjustScehduleTOCurrentWeek } from "../../utils/dates"
 
 
 async function BigCalenderContainer({type, id}:{type:"teacherId"|"classId", id:string | number}) {
@@ -22,10 +23,12 @@ const data = resData.map((lesson) => {
 })
 
 
+const schedule = adjustScehduleTOCurrentWeek(data)
+
 console.log(data)
   return (
     <div>
-     <BigCalander data={data}/>
+     <BigCalander data={schedule}/>
     </div>
   )
 }
