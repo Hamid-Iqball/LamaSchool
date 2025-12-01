@@ -36,7 +36,7 @@ async function Announcements({searchParams}: {
   const {userId, sessionClaims} = await auth()
   const role = (sessionClaims?.publicMetadata as { role: string } | undefined)?.role
 
-  console.log(userId)
+
   const {page, ...queryParams} = searchParams
   const p = page ? parseInt(page) : 1
   

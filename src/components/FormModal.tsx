@@ -1,11 +1,34 @@
 "use client"
 
+import { deleteSubject } from "@/lib/actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useFormState } from "react-dom";
 import { MdClose } from "react-icons/md";
-// import TeacherForms from "./forms/TeacherForms";
-// import StudentForm from "./forms/StudentForm";
+import { toast } from "react-toastify";
+
+
+// Fix the misspellings + match all union keys exactly
+const deleteActionMap= {
+  teacher: deleteSubject,
+  subject: deleteSubject,
+  parent: deleteSubject,
+  student: deleteSubject,
+
+  class: deleteSubject,
+  lesson: deleteSubject,
+  exam: deleteSubject,
+  assignment: deleteSubject,
+
+  result: deleteSubject,
+  attendence: deleteSubject,
+  event: deleteSubject,
+  announcement: deleteSubject,
+};
+
+
 
 //This is how we import dynamically for better performance
 const TeacherForms = dynamic(()=>import("./forms/TeacherForms"),{
@@ -16,33 +39,68 @@ const StudentForm = dynamic(()=>import( "./forms/StudentForm"),{
   loading:()=><h1>Loading...</h1>
 })
 
-const forms:{[key:string]:(type:"create" | "update", data?:any)=>JSX.Element;}={
- teacher:(type,data)=><TeacherForms type={type} data={data} /> ,
- student:(type,data)=><StudentForm type={type} data={data} /> 
-}
+
+const SubjectForm =dynamic(()=>import("./forms/SubjectForm"),{
+  loading:()=><h1>Loading...</h1>
+})
+
+const forms: {
+  [key: string]: (
+    type: "create" | "update",
+    setOpen: Dispatch<SetStateAction<boolean>>,
+    data?: any
+  ) => JSX.Element;
+} = {
+  teacher: (type, setOpen, data) => (
+    <TeacherForms type={type} data={data} setOpen={setOpen} />
+  ),
+  student: (type, setOpen, data) => (
+    <StudentForm type={type} data={data} setOpen={setOpen} />
+  ),
+  subject: (type, setOpen, data) => (
+    <SubjectForm type={type} data={data} setOpen={setOpen} />
+  ),
+};
+
 
 function FormModal({table , type , data , id}:{
   table:"teacher" | "subject" | "parent" | "student" | "class" | "lesson" | "exam" | "assignment"|"result" | "attendence" | "event" | "announcement";
   type:"create" | "update" | "delete";
   data?:any;
-  id?:number | String
+  id?:number | string
   }) {
       
    const [open, setOpen] = useState(false)
+     const [state, formAction, pending] = useFormState(
+       deleteActionMap[table],{
+        success:false,
+        error:false
+       }
+     )
+     const router = useRouter()
+
+   useEffect(()=>{
+       if(state.success){
+         toast(`Subject has been ${type==="create"? "Created":"Updated"} Successfully`)
+         setOpen(false)
+         router.refresh()
+       }
+       },[type,state, router,setOpen])
+
+
     const size= type==="create" ? "w-8 h-8" : "w-7 h-7"
     const bgColor = type ==="create" ? "bg-lamaYellow": type==="update" ? "bg-lamaSky" : "bg-lamaPurple";
 
-
-
     const Form =()=>{
-      return type === "delete" && id? <form action="" className="flex flex-col p-4 gap-4">
+      return type === "delete" && id?
+       <form action={formAction} className="flex flex-col p-4 gap-4">
+        <input type="text | number" name="id" value={id} hidden />
         <span className="text-center font-medium ">All data will be lost. Are you sure you want to delete this {table} ?</span>
-
         <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center" >
         Delete
         </button>
 
-      </form> : type==="create" || type=== "update"?( forms[table](type,data)): "Form Not Found!"
+      </form> : type==="create" || type=== "update"?( forms[table](type,data,setOpen)): "Form Not Found!"
     }
 
 

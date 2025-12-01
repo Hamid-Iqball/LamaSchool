@@ -50,7 +50,7 @@ async function assignmentList({
 }) {
   const { userId, sessionClaims } = await auth()
   const role = (sessionClaims?.metadata as {role:string})?.role 
-   console.log("user",userId , role)
+
   const { page, ...queryParams } = searchParams
   const p = page ? parseInt(page) : 1
   

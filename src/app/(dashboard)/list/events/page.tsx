@@ -58,7 +58,7 @@ async function EventListPage({searchParams}:{
   const role = (sessionClaims?.metadata as {role:string})?.role 
 
 
-  console.log('roless',role)
+ 
   const {page ,...queryParams} = searchParams
   const p = page? parseInt(page) : 1
   
@@ -106,7 +106,7 @@ async function EventListPage({searchParams}:{
 
     query.OR=[
       {classId:null},
-      {class:roleConditions[role as keyof typeof roleConditions] ||{}}
+      // {class:roleConditions[role as keyof typeof roleConditions] ||{}}
     ]
 
         // This is prisma interaction function
