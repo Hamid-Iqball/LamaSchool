@@ -2,7 +2,7 @@
 
 function loading() {
   return (
-    <div>loading...</div>
+    <div className="flex justify-center items-center h-screen text-xl text-amber-700">loading...</div>
   )
 }
 

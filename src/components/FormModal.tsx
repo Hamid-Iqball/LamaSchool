@@ -8,12 +8,13 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
+import { formContainerProps } from "./FormContainer";
 
 
 // Fix the misspellings + match all union keys exactly
 const deleteActionMap= {
-  teacher: deleteSubject,
   subject: deleteSubject,
+  teacher: deleteSubject,
   parent: deleteSubject,
   student: deleteSubject,
 
@@ -48,42 +49,41 @@ const forms: {
   [key: string]: (
     type: "create" | "update",
     setOpen: Dispatch<SetStateAction<boolean>>,
-    data?: any
+    data?: any,
+    relatedData?:any
   ) => JSX.Element;
 } = {
-  teacher: (type, setOpen, data) => (
-    <TeacherForms type={type} data={data} setOpen={setOpen} />
+  teacher: (type, setOpen, data, relatedData) => (
+    <TeacherForms type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />
   ),
-  student: (type, setOpen, data) => (
-    <StudentForm type={type} data={data} setOpen={setOpen} />
+  student: (type, setOpen, data, relatedData) => (
+    <StudentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />
   ),
-  subject: (type, setOpen, data) => (
-    <SubjectForm type={type} data={data} setOpen={setOpen} />
+  subject: (type, setOpen, data , relatedData) => (
+    <SubjectForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />
   ),
 };
 
 
-function FormModal({table , type , data , id}:{
-  table:"teacher" | "subject" | "parent" | "student" | "class" | "lesson" | "exam" | "assignment"|"result" | "attendence" | "event" | "announcement";
-  type:"create" | "update" | "delete";
-  data?:any;
-  id?:number | string
-  }) {
+function FormModal({table , type , data , id,  relatedData}:formContainerProps & {relatedData?:any}) {
       
    const [open, setOpen] = useState(false)
-     const [state, formAction, pending] = useFormState(
+
+
+    const [state, formAction] = useFormState(
        deleteActionMap[table],{
         success:false,
         error:false
        }
      )
-     const router = useRouter()
+
+  const router = useRouter()
 
    useEffect(()=>{
        if(state.success){
          toast(`Subject has been ${type==="create"? "Created":"Updated"} Successfully`)
-         setOpen(false)
          router.refresh()
+         setOpen(false)
        }
        },[type,state, router,setOpen])
 
@@ -93,6 +93,7 @@ function FormModal({table , type , data , id}:{
 
     const Form =()=>{
       return type === "delete" && id?
+
        <form action={formAction} className="flex flex-col p-4 gap-4">
         <input type="text | number" name="id" value={id} hidden />
         <span className="text-center font-medium ">All data will be lost. Are you sure you want to delete this {table} ?</span>
@@ -100,7 +101,7 @@ function FormModal({table , type , data , id}:{
         Delete
         </button>
 
-      </form> : type==="create" || type=== "update"?( forms[table](type,data,setOpen)): "Form Not Found!"
+      </form> : type==="create" || type=== "update"?( forms[table](type,setOpen,data,relatedData)): "Form Not Found!"
     }
 
 
@@ -109,7 +110,7 @@ function FormModal({table , type , data , id}:{
       <div className="p-4">
       <button className={`${size} flex items-center justify-center rounded-full ${bgColor}`} onClick={()=>setOpen(true)}> 
 
-        <Image src={`/${type}.png`} alt="" width={16} height={16}/>
+        <Image src={`/${type}.png`} alt="create" width={16} height={16}/>
       </button> 
       {open && <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex justify-center items-center">
 

@@ -3,6 +3,7 @@
 
 import prisma from "./prisma";
 import { SubjectSchema } from "./fornValidationScehmas";
+import { teachersData } from "./data";
 
 
 type CurrentState ={
@@ -16,7 +17,10 @@ export async function createSubject(currentState:CurrentState, data: SubjectSche
   try {
     await prisma.subject.create({
         data:{
-            name:data.name
+            name:data.name,
+            teachers:{
+              connect:data.teachers.map((teacherId)=>({id:teacherId}))
+            }
         }
     })
 
@@ -32,13 +36,17 @@ export async function createSubject(currentState:CurrentState, data: SubjectSche
 
 //Update Subject
 export async function updateSubject(currentState:CurrentState, data: SubjectSchema) {
+  console.log(data)
   try {
     await prisma.subject.update({
         where:{
             id:data.id
         },
         data:{
-            name:data.name
+            name:data.name,
+            teachers:{
+              set:data.teachers.map((teachId)=>({id:teachId}))
+            }
         }
     })
 
