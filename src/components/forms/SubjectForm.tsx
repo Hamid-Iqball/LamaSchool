@@ -20,20 +20,23 @@ function SubjectForm({type, data, setOpen, relatedData}: {type: "create" | "upda
       }
   });
 
+
   const { teachers } = relatedData || { teachers: [] };
+
 
   const initialState = {
       success: false,
       error: false
   }
 
-  console.log(data)
+
   //from React19 onward the name if this hook wil be useActionState
   const [state, formAction, pending] = useFormState(
     type === "create" ? createSubject : updateSubject,
     initialState
   )
-   const router= useRouter()
+  const router= useRouter()
+  
   const onSubmit = handleSubmit((formData: SubjectSchema) => {
         formAction(type === "update" && data?.id ? { ...formData, id: data.id } : formData)
   })

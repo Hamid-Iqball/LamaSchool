@@ -1,8 +1,7 @@
-import FormModal from "@/components/FormModal"
+import FormContainer from "@/components/FormContainer"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
-import { classesList as columns } from "@/lib/contants"
 import prisma from "@/lib/prisma"
 import { ITEMS_PER_PAGE } from "@/lib/settings"
 import { auth, currentUser } from "@clerk/nextjs/server"
@@ -22,16 +21,16 @@ const renderRow = (item:Classes, role:string)=>(
   
   </td>
       <td className="hidden md:table-cell"> {item.capacity}</td>
-    <td className="hidden md:table-cell">{item.name[0]}</td>
+    <td className="hidden md:table-cell">{item.gradeId}</td>
 
     <td className="hidden md:table-cell">{item.supervisor?.name}</td>
   
   <td>
     <div className="flex items-center gap-2">
     {  role==="admin" && <>
-     <FormModal type="update"  table="class" data={item}  />
+     <FormContainer type="update"  table="class" data={item}  />
        
-      <FormModal type="delete"  table="class" id={item.id}  /> </>}
+      <FormContainer type="delete"  table="class" id={item.id}  /> </>}
         
     </div>
   </td>
@@ -127,7 +126,7 @@ const role = user?.publicMetadata.role as string
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
     <div className="flex items-center justify-between">
-    <h1 className="hidden md:block text-lg font-semibold">All Parents</h1>
+    <h1 className="hidden md:block text-lg font-semibold">All Classes</h1>
     <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
       <TableSearch/>
       <div className="flex items-center gap-4 self-end">
@@ -137,7 +136,7 @@ const role = user?.publicMetadata.role as string
         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
           <Image src="/sort.png" alt="" width={14} height={14} />
         </button>
-       { role === "admin" && <FormModal table="class" type="create"/>}
+       { role === "admin" && <FormContainer table="class" type="create"/>}
       </div>
     </div>
     </div>

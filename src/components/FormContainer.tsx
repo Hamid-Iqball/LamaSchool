@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
+import { teachersData } from "@/lib/data";
 
 export type formContainerProps={
 
@@ -16,14 +17,35 @@ let relatedData = {}
 
 if(type!=="delete"){
     switch (table) {
-        case "subject":
+
+    case "subject":
         const subjectteachers = await prisma.teacher.findMany({
             select:{id:true, name:true , surname:true  }
         })  
-
         relatedData={teachers:subjectteachers}
         break;
-            
+
+    case "class":
+      const classteachers = await prisma.teacher.findMany({
+        select:{
+          id:true, 
+          name:true,
+          surname:true
+        }
+      })
+          const classGrades = await prisma.grade.findMany({
+            select:{
+             id:true, level:true
+            }
+          }) 
+
+          relatedData={
+            teachers: classteachers,
+            grades:classGrades,
+          }
+          break;
+
+
             default:
                 break;
             }

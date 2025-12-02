@@ -1,6 +1,6 @@
 "use client"
 
-import { deleteSubject } from "@/lib/actions";
+import { deleteClass, deleteSubject } from "@/lib/actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { useFormState } from "react-dom";
 import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
 import { formContainerProps } from "./FormContainer";
+import ClassForms from "./forms/ClassForms";
 
 
 // Fix the misspellings + match all union keys exactly
@@ -18,7 +19,7 @@ const deleteActionMap= {
   parent: deleteSubject,
   student: deleteSubject,
 
-  class: deleteSubject,
+  class: deleteClass,
   lesson: deleteSubject,
   exam: deleteSubject,
   assignment: deleteSubject,
@@ -45,6 +46,11 @@ const SubjectForm =dynamic(()=>import("./forms/SubjectForm"),{
   loading:()=><h1>Loading...</h1>
 })
 
+
+const classForm = dynamic(()=>import("./forms/ClassForms"),{
+  loading:()=><h1 className="flex h-full justify-center items-center text-xl text-green-950">Loading...</h1>
+})
+
 const forms: {
   [key: string]: (
     type: "create" | "update",
@@ -62,6 +68,12 @@ const forms: {
   subject: (type, setOpen, data , relatedData) => (
     <SubjectForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />
   ),
+
+  class:(type, setOpen, data , relatedData)=>(
+    <ClassForms type={type} data={data} setOpen={setOpen} relatedData={relatedData} />
+  )
+
+
 };
 
 

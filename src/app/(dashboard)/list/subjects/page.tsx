@@ -82,7 +82,7 @@ async function SubjectsList({searchParams}:{
 
 
 
-  console.log(data)
+
 
      const columns =[
           {
