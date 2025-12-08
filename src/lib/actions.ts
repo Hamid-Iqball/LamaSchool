@@ -343,13 +343,13 @@ export async function deleteTeacher(currentState:CurrentState, data: FormData) {
   try {
 
     const id = data.get("id") as string  //type assertions
-    await prisma.class.delete({
+    await prisma.teacher.delete({
         where:{
-            id:parseInt(id) 
+            id:id
         },
     })
 
-    return { success: true, error:false };
+    return { success: true, error:false, message:"Teacher deleted successfully" };
   } catch (error) {
     console.log(error);
     return { error: true,  success:false };

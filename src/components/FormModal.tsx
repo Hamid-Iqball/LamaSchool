@@ -93,11 +93,11 @@ function FormModal({table , type , data , id,  relatedData}:formContainerProps &
 
    useEffect(()=>{
        if(state.success){
-         toast(`Subject has been ${type==="create"? "Created":"Updated"} Successfully`)
+         toast(`${table} has been ${type==="create"? "Created":"Updated"} Successfully`)
          router.refresh()
          setOpen(false)
        }
-       },[type,state, router,setOpen])
+       },[type,state,table, router,setOpen])
 
 
     const size= type==="create" ? "w-8 h-8" : "w-7 h-7"
