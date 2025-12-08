@@ -23,7 +23,7 @@ async function SignleTeacherPage({params}: {params: {id: string}}) {
             }
 
 
-        const teacher:((Teacher & {_count:{subject:number, lessons:number, classes:number}})|null) = await prisma.teacher.findUnique({  
+        const teacher:((Teacher & {_count:{subjects:number, lessons:number, classes:number}})|null) = await prisma.teacher.findUnique({  
         
         where: {
                 id: params.id,
@@ -99,7 +99,7 @@ async function SignleTeacherPage({params}: {params: {id: string}}) {
                 <div className=" bg-white p-4 rounded-md w-full flex gap-4 md:w-[48%] xl:w-[45%] 2xl:w-[48%]  " >
                     <Image alt="" src="/singleBranch.png" width={24} height={24} className="w-6 h-6"  />
                     <div className="">
-                        <h1 className="text-xl font-semibold">{teacher._count.subject}</h1>
+                        <h1 className="text-xl font-semibold">{teacher._count.subjects}</h1>
                         <span className="text-sm text-gray-400">Subjects</span>
                     </div>
                 </div>
@@ -124,7 +124,7 @@ async function SignleTeacherPage({params}: {params: {id: string}}) {
         {/* Bottom */}
         <div className="mt-4 bg-white rounded-md h-[800px]">
             <h1>Teacher&apos;s Schedule</h1>
-            <BigCalenderContainer />
+            <BigCalenderContainer type="teacherId" id={teacher.id}/>
         </div>
         </div>
         {/* RIGHT */}
