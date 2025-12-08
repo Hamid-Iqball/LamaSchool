@@ -2,7 +2,7 @@
 
 
 import prisma from "./prisma";
-import { ClassSchema, SubjectSchema, TeacherSchema, teacherSchema } from "./fornValidationScehmas";
+import { ClassSchema, StudentSchema, SubjectSchema, TeacherSchema, teacherSchema } from "./fornValidationScehmas";
 import { clerkClient } from "@clerk/nextjs/server";
 
 
@@ -340,9 +340,9 @@ export async function updateTeacher(currentState: CurrentState, data: FormData) 
 
 
 export async function deleteTeacher(currentState:CurrentState, data: FormData) {
+  const id = data.get("id") as string  //type assertions
   try {
-
-    const id = data.get("id") as string  //type assertions
+    (await clerkClient()).users.deleteUser(id);
     await prisma.teacher.delete({
         where:{
             id:id
@@ -356,3 +356,203 @@ export async function deleteTeacher(currentState:CurrentState, data: FormData) {
   }
 }
 
+
+
+// ############## Students Actions ######################
+
+export async function createStudent(currentState: CurrentState, data: StudentSchema) {
+  try {
+    
+    const classItem =  await prisma.class.findUnique({
+      where:{
+        id:data.classId 
+      },
+     include:{
+      _count:{
+        select:{
+          students:true
+        }
+      }
+    }
+    })
+
+
+    //Checking class capacity
+    if(classItem && classItem._count.students >= classItem.capacity){
+      return {
+        success: false,
+        error: true,
+        message: "Class capacity reached. Cannot add more students."
+      };
+    }
+
+    // 1. Create Clerk user(new student)
+    const client = await clerkClient();
+
+    const user = await client.users.createUser({
+      username: data.username,
+      password: data.password,
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: "student" }
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: true,
+        message: "Failed to create user in auth system."
+      };
+    }
+
+    // 2. Insert into database
+    await prisma.student.create({
+      data: {
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        classId: data.classId,
+        gradeId: data.gradeId,
+        parentId: data.parentId,
+      }
+    });
+
+    return { success: true, error: false };
+
+  } catch (error: any) {
+    console.log("🔥 Server Action Error:", error);
+
+    // ==========================
+    // CLERK VALIDATION ERROR
+    // ==========================
+    if (error?.errors?.length) {
+      return {
+        success: false,
+        error: true,
+        message: error.errors[0].message,
+        field: error.errors[0].meta?.param || undefined
+      };
+    }
+
+    // ==========================
+    // PRISMA UNIQUE CONSTRAINT
+    // ==========================
+    if (error.code === "P2002") {
+      return {
+        success: false,
+        error: true,
+        message: `The ${error.meta?.target?.join(", ")} must be unique.`,
+        field: error.meta?.target?.[0] // helps you attach error to form field
+      };
+    }
+
+    // ==========================
+    // ANY OTHER DB ERROR
+    // ==========================
+    if (error.code?.startsWith("P2")) {
+      return {
+        success: false,
+        error: true,
+        message: "A database error occurred."
+      };
+    }
+
+    // ==========================
+    // FALLBACK: RANDOM EXPLOSION
+    // ==========================
+    return {
+      success: false,
+      error: true,
+      message: "Something unexpected happened."
+    };
+  }
+}
+
+
+
+export async function updateStudent(currentState: CurrentState, data: StudentSchema) {
+  try {
+   
+if(!data.id){
+  return {Success: false, error:true, message:"Student ID is required for update."};
+}
+    // Update the user in the auth system
+    const client = await clerkClient();
+
+    const user = await client.users.updateUser(data.id, { 
+      username: data.username,
+      firstName: data.name,
+      lastName: data.surname,
+      password: data.password || undefined, // Only update password if provided
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: true,
+        message: "Failed to update user in auth system.",
+      };
+    }
+
+    // Update the teacher in the database
+    await prisma.student.update({
+      where: { id: data.id },
+      data: {
+        ...(data.password && { password: data.password }), // Only include password if it's provided
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img || null,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        classId: data.classId,
+        gradeId: data.gradeId,
+        parentId: data.parentId,  
+        }
+      
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: true, message: "An error occurred while updating the teacher." };
+  }
+}
+
+
+
+
+export async function deleteStudent(currentState:CurrentState, data: FormData) {
+  const id = data.get("id") as string  //type assertions
+  try {
+
+    (await clerkClient()).users.deleteUser(id);
+    
+    await prisma.student.delete({
+        where:{
+            id:id
+        },
+    })
+
+
+
+
+    return { success: true, error:false, message:"Teacher deleted successfully" };
+  } catch (error) {
+    console.log(error);
+    return { error: true,  success:false };
+  }
+}

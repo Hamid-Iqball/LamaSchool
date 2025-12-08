@@ -58,10 +58,41 @@ if(type!=="delete"){
         relatedData={subjects:teacherSubjects}
         break;
 
+        case "student": 
+          const studentGrades = await prisma.grade.findMany({
+            select:{
+              id:true,
+              level:true
+            }
+          })
+
+          const studentClasses = await prisma.class.findMany({
+          include:{
+            _count:{
+              select:{
+                students:true 
+              }
+            }}
+          })
+
+          relatedData={
+            grades:studentGrades,
+            classes:studentClasses
+          }
+          break
+
+
+
             default:
                 break;
             }
         }
+
+
+
+
+
+
 
   return (
     <div>

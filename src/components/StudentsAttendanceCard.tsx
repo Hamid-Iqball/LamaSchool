@@ -17,7 +17,7 @@ const percentage = toalDays === 0 ? 0 : Math.round((presentDays / toalDays) * 10
   return (
     <div className="">
         <h1 className="text-xl font-semibold">
-           {percentage}%
+           {percentage || "-"}%
         </h1>
         <span className="text-sm text-gray-400">Attendance</span>
     </div>

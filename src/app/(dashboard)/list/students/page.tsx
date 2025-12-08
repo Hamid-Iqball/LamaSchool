@@ -1,3 +1,4 @@
+import FormContainer from "@/components/FormContainer"
 import FormModal from "@/components/FormModal"
 import Paginations from "@/components/Paginations"
 import Table from "@/components/Table"
@@ -32,7 +33,7 @@ const renderRow = (item:studendList, role:string)=>(
        <Image src="/view.png" alt=""  width={30} height={30} className="p-1 rounded-xl hover:cursor-pointer"  />
     </Link>
        
-      <FormModal type="delete"  table="student" id={item.id}  /> </>}
+      <FormContainer type="delete"  table="student" id={item.id}  /> </>}
         
     </div>
   </td>
@@ -149,7 +150,7 @@ async function StudentsList({searchParams}:{
         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
           <Image src="/sort.png" alt="" width={14} height={14} />
         </button>
-       { (role === "admin" || role==="teacher" )&& <FormModal table="student" type="create"/>}
+       { (role === "admin" || role==="teacher" )&& <FormContainer table="student" type="create"/>}
       </div>
     </div>
     </div>

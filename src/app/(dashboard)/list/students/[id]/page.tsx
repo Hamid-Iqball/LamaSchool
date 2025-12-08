@@ -8,10 +8,10 @@ import { checkRole } from "../../../../../../utils/roles"
 import { Class, Lesson, Student } from "@prisma/client"
 import { Suspense } from "react"
 import StudentsAttendanceCard from "@/components/StudentsAttendanceCard"
+import FormContainer from "@/components/FormContainer"
 
 
 async function SignleStudentPage({params}: {params: {id: string}}) {
-
 
     const isAdmin = await checkRole("admin");
     if(!isAdmin){
@@ -53,7 +53,13 @@ async function SignleStudentPage({params}: {params: {id: string}}) {
                 <Image alt="" src={singleStudent?.img || "/avatar.png"} height={80} width={100} className="w-36  rounded-full object-cover"/> </div>
 
                 <div className="w-2/3 flex flex-col justify-between gap-4 ">
+                <span className="flex justify-start gap-4 items-center">
+
                 <h1 className="text-3xl font-semibold">{singleStudent?.name}</h1>
+                {isAdmin && (
+                    <FormContainer table="student" type="update" data={singleStudent} />
+                )}
+                </span>
                 <p className="text-sm text-black text-wrap">Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
                 <div className="grid  grid-cols-1 md:grid-cols-2 text-xs gap-2 ">
                     <div className=" flex items-center gap-2 ">
