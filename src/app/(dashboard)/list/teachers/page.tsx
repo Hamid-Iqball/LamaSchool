@@ -10,6 +10,7 @@ import { headers } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
+import FormContainer from "@/components/FormContainer"
 
 
 type TeachersList = Teacher & {subjects:Subject[]} & {classes:Class[]}
@@ -39,7 +40,7 @@ const renderRow = (item:TeachersList, role:string)=>(
        <Image src="/view.png" alt=""  width={30} height={30} className="p-1 rounded-xl hover:cursor-pointer"  />
     </Link>
        
-      <FormModal type="delete"  table="teacher" id={item.id}  />
+      <FormContainer type="delete"  table="teacher" id={item.id}  />
       
        </>}
         
@@ -164,7 +165,7 @@ async function TeachersList({searchParams}:{
       //  <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
       //     <Image src="/plus.png" alt="" width={14} height={14} />
       //   </button>
-        <FormModal table="teacher" type="create" id={1}/>
+        <FormContainer table="teacher" type="create" id={1}/>
         }
       </div>
     </div>

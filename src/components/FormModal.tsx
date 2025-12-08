@@ -1,6 +1,6 @@
 "use client"
 
-import { deleteClass, deleteSubject } from "@/lib/actions";
+import { deleteClass, deleteSubject, deleteTeacher } from "@/lib/actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ import ClassForms from "./forms/ClassForms";
 // Fix the misspellings + match all union keys exactly
 const deleteActionMap= {
   subject: deleteSubject,
-  teacher: deleteSubject,
+  teacher: deleteTeacher,
   parent: deleteSubject,
   student: deleteSubject,
 

@@ -1,15 +1,17 @@
-import { hostname } from 'os';
-
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images:{
-        remotePatterns:[
-            {
-                hostname:"images.pexels.com"
-            }
-        ]
-    }
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      }
+    ]
+  }
 };
 
 export default nextConfig;

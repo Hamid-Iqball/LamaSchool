@@ -33,18 +33,30 @@ if(type!=="delete"){
           surname:true
         }
       })
-          const classGrades = await prisma.grade.findMany({
-            select:{
-             id:true, level:true
-            }
-          }) 
+      const classGrades = await prisma.grade.findMany({
+        select:{
+          id:true, level:true
+        }
+      }) 
 
-          relatedData={
-            teachers: classteachers,
-            grades:classGrades,
+      relatedData={
+        teachers: classteachers,
+        grades:classGrades,
+      }
+      break;
+
+
+
+      case "teacher":
+        const teacherSubjects = await prisma.subject.findMany({
+          select:{
+            id:true,
+            name:true,
           }
-          break;
+        })
 
+        relatedData={subjects:teacherSubjects}
+        break;
 
             default:
                 break;
