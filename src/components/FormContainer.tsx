@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
 import { teachersData } from "@/lib/data";
+import { auth } from "@clerk/nextjs/server";
 
 export type formContainerProps={
 
@@ -82,6 +83,25 @@ if(type!=="delete"){
           break
 
 
+        case "exam":
+         const {userId,sessionClaims} = await auth()
+         const role =( sessionClaims?.metadata as {
+            role?:"admin"|"teacher"|"student"|"parent"
+            }).role
+
+        const examLessons = await prisma.lesson.findMany({
+            where:{
+              ...(role==="teacher" ? {teacherId:userId!}:{})
+            }, 
+
+            select:{
+              id:true,name:true
+            }
+            })
+  
+       relatedData={lessons:examLessons}
+
+                break;
 
             default:
                 break;

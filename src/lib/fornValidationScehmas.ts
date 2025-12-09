@@ -73,3 +73,19 @@ export const subjectSchema = z.object({
 
 
   export type StudentSchema = z.infer<typeof studentSchema>
+
+
+export const examSchema = z.object({
+  id: z.coerce.number().optional(), // Optional id
+  title: z.string().min(1, { message: "Exam title is required" }), // Title is required and must have at least 1 character
+  startTime: z.coerce.date().refine(date => date instanceof Date && !isNaN(date.getTime()), {
+    message: "Start time is required", // Ensure it's a valid date
+  }),
+  endTime: z.coerce.date().refine(date => date instanceof Date && !isNaN(date.getTime()), {
+    message: "End time is required", // Ensure it's a valid date
+  }),
+  lessonId: z.coerce.number().min(1, { message: "Lesson is required" }), // Lesson ID must be a number and greater than 0
+});
+
+// Type inference for the schema
+export type ExamSchema = z.infer<typeof examSchema>;

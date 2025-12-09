@@ -12,6 +12,7 @@ import { formContainerProps } from "./FormContainer";
 import ClassForms from "./forms/ClassForms";
 
 
+
 // Fix the misspellings + match all union keys exactly
 const deleteActionMap= {
   subject: deleteSubject,
@@ -49,6 +50,12 @@ const classForm = dynamic(()=>import("./forms/ClassForms"),{
   loading:()=><h1 className="flex h-full justify-center items-center text-xl text-green-950">Loading...</h1>
 })
 
+
+
+const ExamForm = dynamic(()=>import("./forms/ExamForm"),{
+  loading:()=><h1 className="flex h-full justify-center items-center text-xl text-green-950">Loading...</h1>
+})
+
 const forms: {
   [key: string]: (
     type: "create" | "update",
@@ -69,7 +76,12 @@ const forms: {
 
   class:(type, setOpen, data , relatedData)=>(
     <ClassForms type={type} data={data} setOpen={setOpen} relatedData={relatedData} />
-  )
+  ),
+
+
+  exam: (type, setOpen, data , relatedData) => (
+    <ExamForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />
+  ),
 
 
 };
