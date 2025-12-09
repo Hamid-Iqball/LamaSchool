@@ -20,7 +20,6 @@ type examList = Exam & {lesson:{
 const renderRow = (item:examList, role:string)=>(
 
 
-  console.log(item),
 <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight">
   
 
@@ -32,7 +31,7 @@ const renderRow = (item:examList, role:string)=>(
      </td>
     <td >{item.lesson.class.name}</td>
     <td className="hidden md:table-cell">{item.lesson.teacher.name}</td>
-    <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)} ({item.lesson?.day})</td>
+    <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)}</td>
   
   <td>
     <div className="flex items-center gap-2">

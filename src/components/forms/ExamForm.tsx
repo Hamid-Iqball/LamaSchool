@@ -5,8 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { examSchema, ExamSchema, SubjectSchema, subjectSchema } from "@/lib/fornValidationScehmas";
 import { createExam, createSubject, updateExam, updateSubject } from "@/lib/actions";
-import { useFormState } from "react-dom"; // or useActionState depending on your React version
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -18,33 +17,34 @@ function ExamForm({type, data, setOpen, relatedData}: {type: "create" | "update"
 
 
   const { lessons } = relatedData 
+  const [loading, setLoading] = useState(false)
 
-
-  const initialState = {
-      success: false,
-      error: false
-  }
-
-
-  //from React19 onward the name if this hook wil be useActionState
-  const [state, formAction, pending] = useFormState(
-    type === "create" ? createExam : updateExam,
-    initialState
-  )
-  const router= useRouter()
+  const router = useRouter()
   
-  const onSubmit = handleSubmit((formData: ExamSchema) => {
-        formAction(type === "update" && data?.id ? { ...formData, id: data.id } : formData)
+  const onSubmit = handleSubmit(async (formData: ExamSchema) => {
+    setLoading(true)
+    try {
+      const result = await (type === "create" ? createExam : updateExam)(
+        { success: false, error: false },
+        type === "update" && data?.id ? { ...formData, id: data.id } : formData
+      )
+      
+      if (result.success) {
+        toast(`EXAM has been ${type === "create" ? "Created" : "Updated"} Successfully`)
+        setOpen(false)
+        router.refresh()
+      }
+    } finally {
+      setLoading(false)
+    }
   })
 
 
   useEffect(()=>{
-  if(state.success){
-    toast(`EXAM has been ${type==="create"? "Created":"Updated"} Successfully`)
-    setOpen(false)
-    router.refresh()
+  if(type === "update" && data?.id) {
+    // Pre-select lesson if editing
   }
-  },[type,state, router,setOpen])
+  },[type, data])
 
 
   
@@ -105,10 +105,10 @@ function ExamForm({type, data, setOpen, relatedData}: {type: "create" | "update"
         </div>
       </div>
 
-      {state.error && <span className="text-red-400 text-center">Something went wrong...</span>}
+      {/* Display server-side error */}
       
-      <button className="bg-blue-400 text-white p-2 rounded-md" disabled={pending}>
-        {pending ? "Loading..." : (type === "create" ? "Create" : "Update")}
+      <button className="bg-blue-400 text-white p-2 rounded-md" disabled={loading}>
+        {loading ? "Loading..." : (type === "create" ? "Create" : "Update")}
       </button>
     </form>
   )

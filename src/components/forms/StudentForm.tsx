@@ -7,7 +7,6 @@ import InputField from "../InputField";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { studentSchema, StudentSchema, teacherSchema, TeacherSchema } from "@/lib/fornValidationScehmas";
-import { useFormState } from "react-dom";
 import { createStudent, createTeacher, updateStudent, updateTeacher } from "@/lib/actions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -22,40 +21,33 @@ function StudentForm({type, data, setOpen, relatedData}: {
   relatedData?: any
 }) {
   const [img, setImg] = useState<any>()
+  const [loading, setLoading] = useState(false)
   
   const {register, handleSubmit, formState: { errors }} = useForm<StudentSchema>({
     resolver: zodResolver(studentSchema),
   });
-
-
-  
-  const [state, formAction] = useFormState(
-    type === "create" ? createStudent : updateStudent,
-    {
-      success: false,
-      error: false,
-      message: ""
-    }
-  )
-  
-  const onSubmit = handleSubmit((data: StudentSchema) => {
-    
-    formAction({...data, img: img?.secure_url}) 
-    
-  })
-  
   
   const router = useRouter()
   
   const {grades, classes} =  relatedData
 
-  useEffect(()=>{
-       if(state.success){
-         toast(`Student has been ${type==="create"? "Created":"Updated"} Successfully`)
-         setOpen(false)
-         router.refresh()
-       } },[state,router,setOpen,type]
-       )
+  const onSubmit = handleSubmit(async (formData: StudentSchema) => {
+    setLoading(true)
+    try {
+      const result = await (type === "create" ? createStudent : updateStudent)(
+        { success: false, error: false, message: "" },
+        type === "update" && data?.id ? { ...formData, img: img?.secure_url, id: data.id } : { ...formData, img: img?.secure_url }
+      )
+      
+      if (result.success) {
+        toast(`Student has been ${type === "create" ? "Created" : "Updated"} Successfully`)
+        setOpen(false)
+        router.refresh()
+      }
+    } finally {
+      setLoading(false)
+    }
+  })
 
   console.log(data)
   return (
@@ -282,8 +274,9 @@ function StudentForm({type, data, setOpen, relatedData}: {
       <button 
         className="bg-blue-400 text-white p-2 rounded-md" 
         type="submit"
+        disabled={loading}
       >
-        {type === "create" ? "Create" : "Update"}
+        {loading ? "Loading..." : (type === "create" ? "Create" : "Update")}
       </button>
     </form>
   )
